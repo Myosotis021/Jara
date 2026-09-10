@@ -55,6 +55,99 @@
             @endif
         </div>
 
+        <!-- Section Anggota Tim Kolaborasi (PRD 3) -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    Anggota Tim Kolaborasi (Total: {{ 1 + $workspace->members->count() }} Orang)
+                </h2>
+            </div>
+
+            <!-- Form Undang Anggota (Khusus Pemilik Workspace) -->
+            @if (auth()->id() === $workspace->user_id)
+                <form action="{{ route('workspaces.members.store', $workspace->id) }}" method="POST" class="flex flex-col sm:flex-row gap-3 items-end mb-5 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
+                    @csrf
+                    <div class="w-full sm:w-80">
+                        <label for="user_id" class="block text-xs font-semibold text-gray-700 mb-1">Undang Pengguna Terdaftar</label>
+                        <select name="user_id" id="user_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500">
+                            <option value="">-- Pilih Pengguna --</option>
+                            @foreach ($availableUsers as $candidate)
+                                <option value="{{ $candidate->id }}">{{ $candidate->name }} ({{ $candidate->email }})</option>
+                            @endforeach
+                        </select>
+                        @error('user_id')
+                            <p class="text-xs text-red-600 mt-1 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition whitespace-nowrap">
+                        + Undang ke Workspace
+                    </button>
+                </form>
+            @endif
+
+            <!-- Tabel Daftar Anggota Tim -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
+                            <th class="py-2.5 px-3 font-semibold">Nama</th>
+                            <th class="py-2.5 px-3 font-semibold">Email</th>
+                            <th class="py-2.5 px-3 font-semibold">Peran</th>
+                            <th class="py-2.5 px-3 font-semibold">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <!-- Baris Pemilik Workspace -->
+                        <tr>
+                            <td class="py-2.5 px-3 font-medium text-gray-900">
+                                {{ $workspace->owner->name ?? 'Pemilik' }}
+                            </td>
+                            <td class="py-2.5 px-3 text-gray-500">
+                                {{ $workspace->owner->email ?? '-' }}
+                            </td>
+                            <td class="py-2.5 px-3">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">PEMILIK</span>
+                            </td>
+                            <td class="py-2.5 px-3 text-gray-400">-</td>
+                        </tr>
+
+                        <!-- Baris Anggota Kolaborasi -->
+                        @foreach ($workspace->members as $member)
+                            <tr>
+                                <td class="py-2.5 px-3 font-medium text-gray-900">
+                                    {{ $member->name }}
+                                </td>
+                                <td class="py-2.5 px-3 text-gray-500">
+                                    {{ $member->email }}
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">ANGGOTA</span>
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    @if (auth()->id() === $workspace->user_id)
+                                        <form action="{{ route('workspaces.members.destroy', [$workspace->id, $member->id]) }}" 
+                                              method="POST" 
+                                              onsubmit="return confirm('Apakah Anda yakin ingin mengeluarkan anggota ini dari workspace?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-800 font-medium hover:underline">
+                                                Keluarkan
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Task List Section -->
         <div class="space-y-6">
             <h2 class="text-base font-semibold text-gray-800">Daftar Tugas & Lampiran</h2>

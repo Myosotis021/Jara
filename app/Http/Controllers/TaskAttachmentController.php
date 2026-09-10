@@ -111,8 +111,11 @@ class TaskAttachmentController extends Controller
      */
     private function authorizeWorkspaceAccess(Workspace $workspace, Task $task): void
     {
-        // User must be workspace owner or task uploader/creator
-        if ($workspace->user_id !== auth()->id() && $task->user_id !== auth()->id()) {
+        $isOwner = $workspace->user_id === auth()->id();
+        $isTaskCreator = $task->user_id === auth()->id();
+        $isMember = $workspace->members()->where('user_id', auth()->id())->exists();
+
+        if (!$isOwner && !$isTaskCreator && !$isMember) {
             abort(403, 'Akses ditolak. Anda tidak memiliki akses ke workspace ini.');
         }
     }
