@@ -26,6 +26,23 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Calon pengguna terdaftar untuk testing kolaborasi tim
+        User::firstOrCreate(
+            ['email' => 'siti@example.com'],
+            [
+                'name' => 'Siti Rahma',
+                'password' => Hash::make('password'),
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'ahmad@example.com'],
+            [
+                'name' => 'Ahmad Dani',
+                'password' => Hash::make('password'),
+            ]
+        );
+
         $workspace = Workspace::firstOrCreate(
             [
                 'user_id' => $user->id,

@@ -20,6 +20,14 @@ Route::get('/', function () {
 });
 
 Route::get('/login', function () {
+    $user = User::first();
+    if ($user) {
+        auth()->login($user);
+        $workspace = Workspace::first();
+        if ($workspace) {
+            return redirect()->route('workspaces.show', $workspace->id);
+        }
+    }
     return 'Silakan login terlebih dahulu.';
 })->name('login');
 
@@ -27,12 +35,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('workspaces', WorkspaceController::class)->except(['show']);
 
     Route::get('/workspaces/{workspace}', function (Workspace $workspace) {
-        if (!auth()->check()) {
-            $user = User::first();
-            if ($user) {
-                auth()->login($user);
-            }
-        }
         $workspace->load(['owner', 'members', 'tasks.attachments.uploader', 'tasks.creator']);
 
         $existingMemberIds = $workspace->members->pluck('id')->push($workspace->user_id)->toArray();
