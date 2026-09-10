@@ -100,3 +100,9 @@ Lihat `CASE.md` untuk spesifikasi lengkap dan user stories. Sistem ini mengelola
 - 4 aktor: Pengunjung, Pengguna (Mahasiswa/Dosen/Staf), Petugas, Admin
 - Slot waktu reservasi 30 menit, jam operasional 07.00–20.00
 - Validasi waktu wajib di sisi server
+
+## Aturan Khusus Proyek
+
+### Manajemen Perubahan Database & Git Commit
+- **Setiap kali ada perubahan tabel** (pembuatan atau perubahan file migrasi database/schema), WAJIB melakukan `git commit` untuk perubahan tersebut.
+
