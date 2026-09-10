@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Task;
 use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,11 +18,48 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $user = User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Budi Santoso',
+                'password' => Hash::make('password'),
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $workspace = Workspace::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'name' => 'Tugas Kuliah Semester 4',
+            ],
+            [
+                'description' => 'Pengelolaan tugas mingguan dan praktikum semester 4',
+            ]
+        );
+
+        Task::firstOrCreate(
+            [
+                'workspace_id' => $workspace->id,
+                'title' => 'Membuat Laporan Praktikum Modul 1',
+            ],
+            [
+                'user_id' => $user->id,
+                'description' => 'Laporan akhir praktikum modul 1 beserta lampiran pdf & zip',
+                'priority' => 'penting',
+                'is_completed' => false,
+            ]
+        );
+
+        Task::firstOrCreate(
+            [
+                'workspace_id' => $workspace->id,
+                'title' => 'Menyusun Slides Presentasi Proyek',
+            ],
+            [
+                'user_id' => $user->id,
+                'description' => 'Bahan tayang untuk diskusi kelompok',
+                'priority' => 'menyusul',
+                'is_completed' => false,
+            ]
+        );
     }
 }
