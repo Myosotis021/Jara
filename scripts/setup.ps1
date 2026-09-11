@@ -97,7 +97,7 @@ Write-Ok "Database siap."
 
 # --- 7. Install dependensi Composer (sebelum app container hidup) ---
 Write-Step "Menginstal dependensi Composer..."
-docker compose run --rm --no-deps app composer install
+docker compose run --rm --no-deps -e COMPOSER_PROCESS_TIMEOUT=0 app composer install
 if ($LASTEXITCODE -ne 0) { Write-Err "Composer install gagal."; exit 1 }
 Write-Ok "Dependensi Composer terinstal."
 

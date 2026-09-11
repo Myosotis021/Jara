@@ -3,8 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Masuk — {{ config('app.name', 'Jara') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Tailwind CDN fallback & Vite assets -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 font-sans antialiased">
     <div class="w-full max-w-md">
