@@ -33,4 +33,21 @@ class Workspace extends Model
     {
         return $this->belongsToMany(User::class, 'workspace_members')->withTimestamps();
     }
+
+    public function hasAccess(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($this->user_id === $user->id) {
+            return true;
+        }
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('workspace_members')) {
+            return $this->members()->where('users.id', $user->id)->exists();
+        }
+
+        return false;
+    }
 }

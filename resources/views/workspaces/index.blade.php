@@ -59,9 +59,9 @@
                                 Pemilik: Anda
                             </span>
                             <div class="flex items-center justify-between pt-3 border-t border-gray-100 text-xs">
-                                <span class="text-blue-600 font-semibold hover:text-blue-800 cursor-pointer">
+                                <a href="{{ route('workspaces.show', $workspace) }}" class="text-blue-600 font-semibold hover:text-blue-800">
                                     Buka
-                                </span>
+                                </a>
                                 <div class="flex items-center space-x-3">
                                     <a href="{{ route('workspaces.edit', $workspace) }}" class="text-gray-600 hover:text-gray-900 font-medium">
                                         Edit
@@ -105,9 +105,9 @@
                                 Anggota (Shared)
                             </span>
                             <div class="flex items-center justify-between pt-3 border-t border-gray-100 text-xs">
-                                <span class="text-blue-600 font-semibold hover:text-blue-800 cursor-pointer">
+                                <a href="{{ route('workspaces.show', $shared) }}" class="text-blue-600 font-semibold hover:text-blue-800">
                                     Buka
-                                </span>
+                                </a>
                             </div>
                         </div>
                     </div>

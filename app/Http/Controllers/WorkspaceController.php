@@ -51,6 +51,44 @@ class WorkspaceController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(Workspace $workspace): View
+    {
+        if (!$workspace->hasAccess(auth()->user())) {
+            abort(403, 'Anda tidak memiliki hak akses ke workspace ini.');
+        }
+
+        $status = request('status');
+        $query = $workspace->tasks()->latest();
+
+        if ($status === 'active') {
+            $query->where('is_completed', false);
+        } elseif ($status === 'completed') {
+            $query->where('is_completed', true);
+        } elseif ($status === 'penting') {
+            $query->where('priority', 'penting');
+        }
+
+        $tasks = $query->get();
+
+        $totalTasks = $workspace->tasks()->count();
+        $completedTasks = $workspace->tasks()->where('is_completed', true)->count();
+        $pentingTasks = $workspace->tasks()->where('priority', 'penting')->count();
+        $progressPercentage = $totalTasks > 0 ? (int) round(($completedTasks / $totalTasks) * 100) : 0;
+
+        return view('workspaces.show', compact(
+            'workspace',
+            'tasks',
+            'totalTasks',
+            'completedTasks',
+            'pentingTasks',
+            'progressPercentage',
+            'status'
+        ));
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Workspace $workspace): View
