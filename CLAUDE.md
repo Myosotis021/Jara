@@ -1,4 +1,4 @@
-# PPK Room Reservation — Agent Guidelines
+# Jara — Agent Guidelines
 
 Proyek ini adalah aplikasi Laravel yang berjalan **sepenuhnya di dalam Docker**. Jangan menginstal PHP atau Composer di mesin host.
 
@@ -93,10 +93,12 @@ docker compose exec app php artisan test
 
 ## Konteks Proyek
 
-Lihat `CASE.md` untuk spesifikasi lengkap dan user stories. Sistem ini mengelola:
+Lihat folder `docs/` untuk spesifikasi lengkap dan PRD setiap fitur (`docs/prd-*.md`). Sistem **Jara** mengelola:
 
-- Reservasi fasilitas kampus (ruang kelas, aula, laboratorium, alat, lapangan)
-- Laporan kerusakan fasilitas
-- 4 aktor: Pengunjung, Pengguna (Mahasiswa/Dosen/Staf), Petugas, Admin
-- Slot waktu reservasi 30 menit, jam operasional 07.00–20.00
-- Validasi waktu wajib di sisi server
+- Manajemen daftar tugas (*to-do list*) dan upload berkas lampiran tugas (*personal & team*)
+- Pengelompokan tugas ke dalam workspace terpisah (misal: kerjaan kantor, tugas kuliah, projek web)
+- Setiap tugas memiliki judul/catatan, prioritas (`Penting`, `Menyusul`), tenggat waktu, dan toggle status selesai
+- Fitur kolaborasi: mengundang pengguna terdaftar ke workspace, melihat tugas bersama, dan update status
+- Pemilik workspace dapat memantau progres (persentase dan jumlah tugas yang selesai)
+- Manajemen pengguna terkontrol: registrasi publik ditutup; akun dibuat dan dihapus oleh Admin
+- Aktor: Administrator (`admin`), Pengguna/Anggota (`user`), Pemilik Workspace (*Owner*), dan Anggota Workspace (*Member*)
