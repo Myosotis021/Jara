@@ -102,3 +102,8 @@ Lihat folder `docs/` untuk spesifikasi lengkap dan PRD setiap fitur (`docs/prd-*
 - Pemilik workspace dapat memantau progres (persentase dan jumlah tugas yang selesai)
 - Manajemen pengguna terkontrol: registrasi publik ditutup; akun dibuat dan dihapus oleh Admin
 - Aktor: Administrator (`admin`), Pengguna/Anggota (`user`), Pemilik Workspace (*Owner*), dan Anggota Workspace (*Member*)
+
+## Aturan Khusus Proyek
+
+### Manajemen Perubahan Database & Git Commit
+- **Setiap kali ada perubahan tabel** (pembuatan atau perubahan file migrasi database/schema), WAJIB melakukan `git commit` untuk perubahan tersebut.

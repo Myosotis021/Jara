@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\WorkspaceController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,11 @@ Route::middleware('auth')->group(function () {
     Route::get('workspaces/{workspace}/tasks/{task}/edit', [TaskController::class, 'edit'])->name('workspaces.tasks.edit');
     Route::put('workspaces/{workspace}/tasks/{task}', [TaskController::class, 'update'])->name('workspaces.tasks.update');
     Route::delete('workspaces/{workspace}/tasks/{task}', [TaskController::class, 'destroy'])->name('workspaces.tasks.destroy');
+
+    // Task Attachments
+    Route::post('workspaces/{workspace}/tasks/{task}/attachments', [TaskAttachmentController::class, 'store'])->name('workspaces.tasks.attachments.store');
+    Route::get('workspaces/{workspace}/tasks/{task}/attachments/{attachment}/download', [TaskAttachmentController::class, 'download'])->name('workspaces.tasks.attachments.download');
+    Route::delete('workspaces/{workspace}/tasks/{task}/attachments/{attachment}', [TaskAttachmentController::class, 'destroy'])->name('workspaces.tasks.attachments.destroy');
 });
 
 /*

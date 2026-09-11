@@ -7,6 +7,8 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -30,19 +32,29 @@ class User extends Authenticatable
         ];
     }
 
-    public function workspaces(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function workspaces(): HasMany
     {
         return $this->hasMany(Workspace::class);
     }
 
-    public function ownedWorkspaces(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function ownedWorkspaces(): HasMany
     {
         return $this->hasMany(Workspace::class);
     }
 
-    public function memberWorkspaces(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function memberWorkspaces(): BelongsToMany
     {
         return $this->belongsToMany(Workspace::class, 'workspace_members')->withTimestamps();
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(TaskAttachment::class);
     }
 
     /**
