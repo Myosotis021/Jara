@@ -1,7 +1,9 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\WorkspaceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,16 +25,21 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Auth Routes (Authenticated)
+| Authenticated Routes
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Placeholder untuk fitur workspace (akan dikerjakan programmer lain)
-    Route::get('/workspaces', function () {
-        return view('workspaces.index');
-    })->name('workspaces.index');
+    // Workspace Management
+    Route::resource('workspaces', WorkspaceController::class);
+
+    // Task Management
+    Route::post('workspaces/{workspace}/tasks', [TaskController::class, 'store'])->name('workspaces.tasks.store');
+    Route::patch('workspaces/{workspace}/tasks/{task}/toggle-status', [TaskController::class, 'toggleStatus'])->name('workspaces.tasks.toggle-status');
+    Route::get('workspaces/{workspace}/tasks/{task}/edit', [TaskController::class, 'edit'])->name('workspaces.tasks.edit');
+    Route::put('workspaces/{workspace}/tasks/{task}', [TaskController::class, 'update'])->name('workspaces.tasks.update');
+    Route::delete('workspaces/{workspace}/tasks/{task}', [TaskController::class, 'destroy'])->name('workspaces.tasks.destroy');
 });
 
 /*

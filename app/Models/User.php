@@ -30,6 +30,21 @@ class User extends Authenticatable
         ];
     }
 
+    public function workspaces(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Workspace::class);
+    }
+
+    public function ownedWorkspaces(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Workspace::class);
+    }
+
+    public function memberWorkspaces(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Workspace::class, 'workspace_members')->withTimestamps();
+    }
+
     /**
      * Cek apakah user adalah admin.
      */

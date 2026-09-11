@@ -4,68 +4,102 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Jara') — {{ config('app.name', 'Jara') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <title>@yield('title', 'JARA - Sistem Manajemen Workspace & Tugas')</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
+
+    <!-- Tailwind CDN fallback & Vite assets -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
 </head>
-<body class="bg-gray-50 min-h-screen font-sans text-gray-900 antialiased">
-    {{-- Navbar --}}
-    <nav class="bg-white border-b border-gray-200 shadow-sm">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <div class="flex justify-between items-center h-16">
-                {{-- Logo --}}
-                <div class="flex items-center gap-6">
-                    <a href="/" class="text-xl font-bold text-blue-600 tracking-tight">JARA</a>
-                    <div class="hidden sm:flex items-center gap-1">
-                        @if(auth()->user()->isAdmin())
-                            <a href="{{ route('admin.users.index') }}"
-                               class="px-3 py-2 rounded-lg text-sm font-medium transition
-                                      {{ request()->routeIs('admin.users.*') ? 'text-blue-700 bg-blue-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' }}">
-                                Kelola Pengguna
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col font-sans">
+    <!-- Navigation Bar -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo & Left Links -->
+                <div class="flex items-center space-x-6">
+                    <a href="{{ route('workspaces.index') }}" class="flex items-center space-x-2">
+                        <span class="text-2xl font-bold text-blue-600 tracking-tight">JARA</span>
+                    </a>
+                    @auth
+                        <div class="hidden sm:flex items-center space-x-2">
+                            <a href="{{ route('workspaces.index') }}"
+                               class="text-sm font-semibold px-3 py-2 rounded-lg transition
+                                      {{ request()->is('workspaces*') ? 'text-blue-700 bg-blue-50' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50' }}">
+                                Workspaces
                             </a>
-                        @endif
-                        <a href="/workspaces"
-                           class="px-3 py-2 rounded-lg text-sm font-medium transition
-                                  {{ request()->is('workspaces*') ? 'text-blue-700 bg-blue-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' }}">
-                            Workspaces
-                        </a>
-                    </div>
+                            @if(auth()->user()->isAdmin())
+                                <a href="{{ route('admin.users.index') }}"
+                                   class="text-sm font-semibold px-3 py-2 rounded-lg transition
+                                          {{ request()->routeIs('admin.users.*') ? 'text-purple-700 bg-purple-50' : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50' }}">
+                                    Kelola Pengguna
+                                </a>
+                            @endif
+                        </div>
+                    @endauth
                 </div>
 
-                {{-- User Menu --}}
-                <div class="flex items-center gap-3">
-                    <span class="text-sm text-gray-600 hidden sm:inline">
-                        Halo, <span class="font-semibold text-gray-800">{{ auth()->user()->name }}</span>
-                    </span>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit"
-                                class="text-sm text-red-600 hover:text-red-800 font-medium px-3 py-2 rounded-lg hover:bg-red-50 transition">
-                            Keluar
-                        </button>
-                    </form>
+                <!-- Right User Menu -->
+                <div class="flex items-center space-x-4">
+                    @auth
+                        <span class="text-sm text-gray-600 hidden sm:inline">
+                            Halo, <strong class="text-gray-900">{{ auth()->user()->name }}</strong>
+                        </span>
+                        <form action="{{ route('logout') }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit"
+                                    class="text-sm font-medium text-red-600 hover:text-red-800 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 transition cursor-pointer">
+                                Keluar
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                            Masuk
+                        </a>
+                    @endauth
                 </div>
             </div>
         </div>
     </nav>
 
-    {{-- Flash Messages --}}
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 mt-4">
-        @if(session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-lg mb-4">
-                {{ session('success') }}
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Flash Alert Messages -->
+        @if (session('success'))
+            <div class="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 text-green-800 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-sm font-medium">{{ session('success') }}</span>
+                </div>
             </div>
         @endif
 
-        @if(session('error'))
-            <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-4">
-                {{ session('error') }}
+        @if (session('error'))
+            <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    <span class="text-sm font-medium">{{ session('error') }}</span>
+                </div>
             </div>
         @endif
-    </div>
 
-    {{-- Main Content --}}
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
         @yield('content')
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-500">
+            &copy; {{ date('Y') }} JARA — Sistem Manajemen Workspace &amp; Tugas.
+        </div>
+    </footer>
 </body>
 </html>
