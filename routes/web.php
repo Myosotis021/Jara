@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\WorkspaceController;
+use App\Http\Controllers\WorkspaceMemberController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,6 +35,12 @@ Route::middleware('auth')->group(function () {
 
     // Workspace Management
     Route::resource('workspaces', WorkspaceController::class);
+
+    // Workspace Members Routes (PRD 3 - Kolaborasi Workspace)
+    Route::post('/workspaces/{workspace}/members', [WorkspaceMemberController::class, 'store'])
+        ->name('workspaces.members.store');
+    Route::delete('/workspaces/{workspace}/members/{user}', [WorkspaceMemberController::class, 'destroy'])
+        ->name('workspaces.members.destroy');
 
     // Task Management
     Route::post('workspaces/{workspace}/tasks', [TaskController::class, 'store'])->name('workspaces.tasks.store');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -59,6 +60,18 @@ class WorkspaceController extends Controller
             abort(403, 'Anda tidak memiliki hak akses ke workspace ini.');
         }
 
+        $relations = ['owner', 'tasks.attachments.uploader', 'tasks.creator'];
+        if (Schema::hasTable('workspace_members')) {
+            $relations[] = 'members';
+        }
+        $workspace->load($relations);
+
+        $existingMemberIds = Schema::hasTable('workspace_members')
+            ? $workspace->members->pluck('id')->push($workspace->user_id)->toArray()
+            : [$workspace->user_id];
+
+        $availableUsers = User::whereNotIn('id', $existingMemberIds)->get();
+
         $status = request('status');
         $query = $workspace->tasks()->latest();
 
@@ -79,6 +92,7 @@ class WorkspaceController extends Controller
 
         return view('workspaces.show', compact(
             'workspace',
+            'availableUsers',
             'tasks',
             'totalTasks',
             'completedTasks',
