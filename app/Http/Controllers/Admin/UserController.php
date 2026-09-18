@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\TaskAttachment;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -51,7 +54,7 @@ class UserController extends Controller
     }
 
     /**
-     * Hapus pengguna dari sistem.
+     * Hapus pengguna dari sistem secara atomic dan bersihkan file lampiran.
      */
     public function destroy(User $user)
     {
@@ -60,7 +63,31 @@ class UserController extends Controller
                 ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
-        $user->delete();
+        // Collect file paths before user deletion (CASCADE will delete DB records)
+        $ownedWorkspaceFilePaths = TaskAttachment::whereHas('task.workspace', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->pluck('file_path');
+
+        $uploadedFilePaths = TaskAttachment::where('user_id', $user->id)->pluck('file_path');
+
+        $filePaths = $ownedWorkspaceFilePaths->merge($uploadedFilePaths)
+            ->unique()
+            ->filter()
+            ->values()
+            ->toArray();
+
+        try {
+            DB::transaction(function () use ($user) {
+                $user->delete();
+            });
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Gagal menghapus pengguna. Silakan coba lagi.');
+        }
+
+        if (!empty($filePaths)) {
+            Storage::disk('public')->delete($filePaths);
+        }
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Pengguna berhasil dihapus.');
