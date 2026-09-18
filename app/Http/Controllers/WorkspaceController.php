@@ -19,9 +19,7 @@ class WorkspaceController extends Controller
     public function index(): View
     {
         $myWorkspaces = auth()->user()->ownedWorkspaces()->latest()->get();
-        $sharedWorkspaces = Schema::hasTable('workspace_members')
-            ? auth()->user()->memberWorkspaces()->latest()->get()
-            : collect();
+        $sharedWorkspaces = auth()->user()->memberWorkspaces()->latest()->get();
 
         return view('workspaces.index', compact('myWorkspaces', 'sharedWorkspaces'));
     }
@@ -62,20 +60,15 @@ class WorkspaceController extends Controller
             abort(403, 'Anda tidak memiliki hak akses ke workspace ini.');
         }
 
-        $relations = ['owner', 'tasks.attachments.uploader', 'tasks.creator'];
-        if (Schema::hasTable('workspace_members')) {
-            $relations[] = 'members';
-        }
-        $workspace->load($relations);
+        // Eager load workspace owner and members
+        $workspace->load(['owner', 'members']);
 
-        $existingMemberIds = Schema::hasTable('workspace_members')
-            ? $workspace->members->pluck('id')->push($workspace->user_id)->toArray()
-            : [$workspace->user_id];
+        $existingMemberIds = $workspace->members->pluck('id')->push($workspace->user_id)->toArray();
+        $availableUsers = User::whereNotIn('id', $existingMemberIds)->take(10)->get();
 
-        $availableUsers = User::whereNotIn('id', $existingMemberIds)->get();
-
+        // Eager load task creator and attachment uploaders to eliminate N+1 queries
         $status = request('status');
-        $query = $workspace->tasks()->latest();
+        $query = $workspace->tasks()->with(['creator', 'attachments.uploader'])->latest();
 
         if ($status === 'active') {
             $query->where('is_completed', false);
@@ -87,9 +80,16 @@ class WorkspaceController extends Controller
 
         $tasks = $query->get();
 
-        $totalTasks = $workspace->tasks()->count();
-        $completedTasks = $workspace->tasks()->where('is_completed', true)->count();
-        $pentingTasks = $workspace->tasks()->where('priority', 'penting')->count();
+        // Single aggregation query for progress stats instead of 3 separate count queries
+        $stats = $workspace->tasks()->selectRaw("
+            COUNT(*) as total,
+            COALESCE(SUM(CASE WHEN is_completed = 1 THEN 1 ELSE 0 END), 0) as completed,
+            COALESCE(SUM(CASE WHEN priority = 'penting' THEN 1 ELSE 0 END), 0) as penting
+        ")->first();
+
+        $totalTasks = (int) ($stats->total ?? 0);
+        $completedTasks = (int) ($stats->completed ?? 0);
+        $pentingTasks = (int) ($stats->penting ?? 0);
         $progressPercentage = $totalTasks > 0 ? (int) round(($completedTasks / $totalTasks) * 100) : 0;
 
         return view('workspaces.show', compact(

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\Workspace;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +50,7 @@ class TaskController extends Controller
     /**
      * Toggle the completion status of the task.
      */
-    public function toggleStatus(Workspace $workspace, Task $task): RedirectResponse
+    public function toggleStatus(Workspace $workspace, Task $task): RedirectResponse|JsonResponse
     {
         if ($task->workspace_id !== $workspace->id) {
             abort(404);
@@ -64,6 +65,30 @@ class TaskController extends Controller
             'is_completed' => $isCompleted,
             'completed_at' => $isCompleted ? now() : null,
         ]);
+
+        if (request()->expectsJson() || request()->ajax() || request()->header('Accept') === 'application/json') {
+            $stats = $workspace->tasks()->selectRaw("
+                COUNT(*) as total,
+                COALESCE(SUM(CASE WHEN is_completed = 1 THEN 1 ELSE 0 END), 0) as completed,
+                COALESCE(SUM(CASE WHEN priority = 'penting' THEN 1 ELSE 0 END), 0) as penting
+            ")->first();
+
+            $total = (int) ($stats->total ?? 0);
+            $completed = (int) ($stats->completed ?? 0);
+            $progress = $total > 0 ? (int) round(($completed / $total) * 100) : 0;
+
+            return response()->json([
+                'success' => true,
+                'task_id' => $task->id,
+                'is_completed' => (bool) $task->is_completed,
+                'stats' => [
+                    'total' => $total,
+                    'completed' => $completed,
+                    'penting' => (int) ($stats->penting ?? 0),
+                    'progress_percentage' => $progress,
+                ],
+            ]);
+        }
 
         return redirect()->route('workspaces.show', $workspace)->with('success', 'Status tugas berhasil diperbarui.');
     }
