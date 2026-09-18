@@ -66,7 +66,7 @@
                                     <a href="{{ route('workspaces.edit', $workspace) }}" class="text-gray-600 hover:text-gray-900 font-medium">
                                         Edit
                                     </a>
-                                    <form action="{{ route('workspaces.destroy', $workspace) }}" method="POST" class="inline" onsubmit="return confirm('Hapus workspace ini? Seluruh tugas di dalamnya akan ikut terhapus.')">
+                                    <form action="{{ route('workspaces.destroy', $workspace) }}" method="POST" class="inline" onsubmit="return confirm('Hapus workspace ini? Seluruh tugas dan file lampiran di dalamnya akan ikut terhapus permanen.')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-800 font-medium cursor-pointer">
