@@ -113,56 +113,6 @@
          =================================================================== -->
     <footer class="apple-footer">
         <div style="max-width:1440px;margin:0 auto;">
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;padding-bottom:40px;border-bottom:1px solid #e0e0e0;">
-
-                <!-- Col 1: Navigation -->
-                <div>
-                    <h3 class="typography-caption-strong" style="color:#1d1d1f;margin:0 0 12px;">Navigasi JARA</h3>
-                    <ul class="typography-dense-link" style="color:#333333;list-style:none;padding:0;margin:0;font-size:14px;">
-                        <li><a href="{{ route('workspaces.index') }}" class="apple-text-link">Workspace Saya</a></li>
-                        <li><a href="{{ route('workspaces.create') }}" class="apple-text-link">Buat Ruang Kerja Baru</a></li>
-                        @auth
-                            @if(auth()->user()->isAdmin())
-                                <li><a href="{{ route('admin.users.index') }}" class="apple-text-link">Manajemen Pengguna</a></li>
-                            @endif
-                        @endauth
-                    </ul>
-                </div>
-
-                <!-- Col 2: Features -->
-                <div>
-                    <h3 class="typography-caption-strong" style="color:#1d1d1f;margin:0 0 12px;">Kolaborasi & Tugas</h3>
-                    <ul class="typography-dense-link" style="color:#333333;list-style:none;padding:0;margin:0;font-size:14px;">
-                        <li>Manajemen Prioritas Tugas</li>
-                        <li>Monitoring Progres Tim</li>
-                        <li>Lampiran Dokumen & Berkas</li>
-                    </ul>
-                </div>
-
-                <!-- Col 3: Design info -->
-                <div>
-                    <h3 class="typography-caption-strong" style="color:#1d1d1f;margin:0 0 12px;">Spesifikasi UI/UX</h3>
-                    <ul class="typography-dense-link" style="color:#333333;list-style:none;padding:0;margin:0;font-size:14px;">
-                        <li>Apple Design System</li>
-                        <li>SF Pro / Inter Typography</li>
-                        <li>Action Blue (#0066cc)</li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: Account -->
-                <div>
-                    <h3 class="typography-caption-strong" style="color:#1d1d1f;margin:0 0 12px;">Akun & Sesi</h3>
-                    <div class="typography-fine-print" style="color:#7a7a7a;line-height:1.6;">
-                        @auth
-                            Masuk sebagai <strong style="color:#333333;">{{ auth()->user()->name }}</strong><br>
-                            {{ auth()->user()->email }}
-                        @else
-                            Silakan masuk menggunakan akun terdaftar untuk mengelola tugas Anda.
-                        @endauth
-                    </div>
-                </div>
-            </div>
-
             <!-- Legal row -->
             <div style="padding-top:24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
                 <span class="typography-fine-print" style="color:#7a7a7a;">

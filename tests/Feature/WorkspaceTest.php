@@ -30,7 +30,7 @@ class WorkspaceTest extends TestCase
         $response = $this->actingAs($user)->get('/workspaces');
 
         $response->assertStatus(200);
-        $response->assertSee('Workspace & Daftar Tugas Saya');
+        $response->assertSee('Workspace & Daftar Tugas Saya', false);
         $response->assertSee('Belum Ada Workspace Dibuat');
     }
 
@@ -103,6 +103,7 @@ class WorkspaceTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Edit Workspace');
+        $response->assertSee('Hapus Workspace');
         $response->assertSee('Projek Akhir');
     }
 

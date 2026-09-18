@@ -217,9 +217,21 @@ function initAppleDateTimePickers() {
                     Waktu
                 </span>
                 <div style="display:flex;align-items:center;gap:4px;">
-                    <select class="apple-time-select apple-time-hour"></select>
+                    <div class="apple-custom-time-dropdown" style="position:relative;display:inline-block;">
+                        <button type="button" class="apple-time-trigger apple-hour-trigger" style="height:32px;padding:0 8px;background-color:#fafafc;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;font-weight:600;color:#1d1d1f;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
+                            <span class="apple-hour-display">00</span>
+                            <svg width="10" height="10" fill="none" stroke="#7a7a7a" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="apple-time-menu apple-hour-menu"></div>
+                    </div>
                     <span style="font-weight:600;color:#1d1d1f;font-size:15px;">:</span>
-                    <select class="apple-time-select apple-time-minute"></select>
+                    <div class="apple-custom-time-dropdown" style="position:relative;display:inline-block;">
+                        <button type="button" class="apple-time-trigger apple-minute-trigger" style="height:32px;padding:0 8px;background-color:#fafafc;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;font-weight:600;color:#1d1d1f;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
+                            <span class="apple-minute-display">00</span>
+                            <svg width="10" height="10" fill="none" stroke="#7a7a7a" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="apple-time-menu apple-minute-menu"></div>
+                    </div>
                 </div>
             </div>
 
@@ -241,27 +253,135 @@ function initAppleDateTimePickers() {
         // ------------------------------------------------------------------
         // DOM references within popup
         // ------------------------------------------------------------------
-        const monthYearEl = popup.querySelector('.apple-cal-month-year');
-        const daysGrid    = popup.querySelector('.apple-cal-days');
-        const prevBtn     = popup.querySelector('.apple-cal-prev');
-        const nextBtn     = popup.querySelector('.apple-cal-next');
-        const hourSelect  = popup.querySelector('.apple-time-hour');
-        const minSelect   = popup.querySelector('.apple-time-minute');
-        const applyBtn    = popup.querySelector('.apple-cal-apply');
-        const closeBtn    = popup.querySelector('.apple-cal-close');
+        const monthYearEl  = popup.querySelector('.apple-cal-month-year');
+        const daysGrid     = popup.querySelector('.apple-cal-days');
+        const prevBtn      = popup.querySelector('.apple-cal-prev');
+        const nextBtn      = popup.querySelector('.apple-cal-next');
+        const hourTrigger  = popup.querySelector('.apple-hour-trigger');
+        const hourDisplay  = popup.querySelector('.apple-hour-display');
+        const hourMenu     = popup.querySelector('.apple-hour-menu');
+        const minTrigger   = popup.querySelector('.apple-minute-trigger');
+        const minDisplay   = popup.querySelector('.apple-minute-display');
+        const minMenu      = popup.querySelector('.apple-minute-menu');
+        const applyBtn     = popup.querySelector('.apple-cal-apply');
+        const closeBtn     = popup.querySelector('.apple-cal-close');
 
-        // Populate hour/minute options
-        for (let h = 0; h < 24; h++) {
-            const opt = document.createElement('option');
-            opt.value = String(h).padStart(2, '0');
-            opt.textContent = String(h).padStart(2, '0');
-            hourSelect.appendChild(opt);
+        // Apply guaranteed popup menu styles to time dropdowns
+        const menuBaseStyle = {
+            position: 'absolute',
+            bottom: 'calc(100% + 6px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '60px',
+            maxHeight: '140px',
+            overflowY: 'auto',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e0e0e0',
+            borderRadius: '10px',
+            boxShadow: '0 10px 28px rgba(0, 0, 0, 0.16)',
+            zIndex: '200',
+            display: 'none',
+            padding: '4px',
+            boxSizing: 'border-box'
+        };
+        Object.assign(hourMenu.style, menuBaseStyle);
+        Object.assign(minMenu.style, menuBaseStyle);
+
+        let currentHour   = '00';
+        let currentMinute = '00';
+
+        function closeTimeMenus() {
+            hourMenu.style.display = 'none';
+            hourMenu.classList.remove('is-open');
+            hourTrigger.classList.remove('is-active');
+            minMenu.style.display = 'none';
+            minMenu.classList.remove('is-open');
+            minTrigger.classList.remove('is-active');
         }
-        ['00','05','10','15','20','25','30','35','40','45','50','55'].forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m;
-            opt.textContent = m;
-            minSelect.appendChild(opt);
+
+        function renderTimeDropdowns() {
+            // Render Hour options (00..23)
+            hourMenu.innerHTML = '';
+            for (let h = 0; h < 24; h++) {
+                const val = String(h).padStart(2, '0');
+                const opt = document.createElement('div');
+                opt.className = `apple-time-option ${val === currentHour ? 'is-selected' : ''}`;
+                opt.textContent = val;
+                opt.style.padding = '6px 0';
+                opt.style.textAlign = 'center';
+                opt.style.fontSize = '13px';
+                opt.style.fontWeight = val === currentHour ? '600' : '500';
+                opt.style.cursor = 'pointer';
+                opt.style.borderRadius = '6px';
+                opt.style.backgroundColor = val === currentHour ? '#0066cc' : '';
+                opt.style.color = val === currentHour ? '#ffffff' : '#1d1d1f';
+
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentHour = val;
+                    hourDisplay.textContent = currentHour;
+                    closeTimeMenus();
+                    if (selectedDate) {
+                        selectedDate.setHours(parseInt(currentHour, 10));
+                    }
+                    renderTimeDropdowns();
+                });
+                hourMenu.appendChild(opt);
+            }
+
+            // Render Minute options (00, 05, 10, ... 55)
+            minMenu.innerHTML = '';
+            ['00','05','10','15','20','25','30','35','40','45','50','55'].forEach(m => {
+                const opt = document.createElement('div');
+                opt.className = `apple-time-option ${m === currentMinute ? 'is-selected' : ''}`;
+                opt.textContent = m;
+                opt.style.padding = '6px 0';
+                opt.style.textAlign = 'center';
+                opt.style.fontSize = '13px';
+                opt.style.fontWeight = m === currentMinute ? '600' : '500';
+                opt.style.cursor = 'pointer';
+                opt.style.borderRadius = '6px';
+                opt.style.backgroundColor = m === currentMinute ? '#0066cc' : '';
+                opt.style.color = m === currentMinute ? '#ffffff' : '#1d1d1f';
+
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentMinute = m;
+                    minDisplay.textContent = currentMinute;
+                    closeTimeMenus();
+                    if (selectedDate) {
+                        selectedDate.setMinutes(parseInt(currentMinute, 10));
+                    }
+                    renderTimeDropdowns();
+                });
+                minMenu.appendChild(opt);
+            });
+        }
+
+        hourTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = hourMenu.style.display === 'block';
+            closeTimeMenus();
+            if (!isOpen) {
+                hourMenu.style.display = 'block';
+                hourMenu.classList.add('is-open');
+                hourTrigger.classList.add('is-active');
+                const sel = hourMenu.querySelector('.is-selected');
+                if (sel) hourMenu.scrollTop = sel.offsetTop - 50;
+            }
+        });
+
+        minTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = minMenu.style.display === 'block';
+            closeTimeMenus();
+            if (!isOpen) {
+                minMenu.style.display = 'block';
+                minMenu.classList.add('is-open');
+                minTrigger.classList.add('is-active');
+                const sel = minMenu.querySelector('.is-selected');
+                if (sel) minMenu.scrollTop = sel.offsetTop - 50;
+            }
         });
 
         const MONTHS = [
@@ -341,9 +461,11 @@ function initAppleDateTimePickers() {
                     cell.classList.add('is-selected');
                 }
 
-                cell.addEventListener('click', () => {
-                    const h = parseInt(hourSelect.value, 10) || 0;
-                    const m = parseInt(minSelect.value,  10) || 0;
+                cell.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeTimeMenus();
+                    const h = parseInt(currentHour, 10) || 0;
+                    const m = parseInt(currentMinute, 10) || 0;
                     selectedDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), d, h, m);
                     renderCalendar();
                 });
@@ -353,10 +475,13 @@ function initAppleDateTimePickers() {
 
             // Sync time selectors with selected date
             if (selectedDate) {
-                hourSelect.value = String(selectedDate.getHours()).padStart(2, '0');
+                currentHour = String(selectedDate.getHours()).padStart(2, '0');
                 const nearestMin = Math.round(selectedDate.getMinutes() / 5) * 5;
-                minSelect.value  = String(nearestMin === 60 ? 55 : nearestMin).padStart(2, '0');
+                currentMinute = String(nearestMin === 60 ? 55 : nearestMin).padStart(2, '0');
             }
+            hourDisplay.textContent = currentHour;
+            minDisplay.textContent = currentMinute;
+            renderTimeDropdowns();
         }
 
         // ------------------------------------------------------------------
@@ -373,6 +498,7 @@ function initAppleDateTimePickers() {
         }
 
         function closePopup() {
+            closeTimeMenus();
             popup.classList.remove('is-open');
             trigger.classList.remove('is-active');
             trigger.setAttribute('aria-expanded', 'false');
@@ -388,35 +514,39 @@ function initAppleDateTimePickers() {
         });
 
         // Navigation
-        prevBtn.addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth() - 1); renderCalendar(); });
-        nextBtn.addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth() + 1); renderCalendar(); });
+        prevBtn.addEventListener('click', (e) => { e.stopPropagation(); closeTimeMenus(); viewDate.setMonth(viewDate.getMonth() - 1); renderCalendar(); });
+        nextBtn.addEventListener('click', (e) => { e.stopPropagation(); closeTimeMenus(); viewDate.setMonth(viewDate.getMonth() + 1); renderCalendar(); });
 
-        // Quick presets
-        popup.querySelector('.apple-preset-today').addEventListener('click', () => {
+        // Quick presets (updates selection without closing popup until Terapkan is pressed)
+        popup.querySelector('.apple-preset-today').addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeTimeMenus();
             const now = new Date();
             selectedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 0);
             viewDate = new Date(selectedDate);
-            updateDisplay();
-            closePopup();
+            renderCalendar();
         });
 
-        popup.querySelector('.apple-preset-tomorrow').addEventListener('click', () => {
+        popup.querySelector('.apple-preset-tomorrow').addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeTimeMenus();
             const now = new Date();
             now.setDate(now.getDate() + 1);
             selectedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0);
             viewDate = new Date(selectedDate);
-            updateDisplay();
-            closePopup();
+            renderCalendar();
         });
 
-        popup.querySelector('.apple-preset-clear').addEventListener('click', () => {
+        popup.querySelector('.apple-preset-clear').addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeTimeMenus();
             selectedDate = null;
-            updateDisplay();
             renderCalendar();
         });
 
         clearBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            closeTimeMenus();
             selectedDate = null;
             updateDisplay();
         });
@@ -424,9 +554,10 @@ function initAppleDateTimePickers() {
         // Apply selection
         applyBtn.addEventListener('click', () => {
             if (selectedDate) {
-                selectedDate.setHours(parseInt(hourSelect.value, 10) || 0);
-                selectedDate.setMinutes(parseInt(minSelect.value,  10) || 0);
+                selectedDate.setHours(parseInt(currentHour, 10) || 0);
+                selectedDate.setMinutes(parseInt(currentMinute, 10) || 0);
             }
+            closeTimeMenus();
             updateDisplay();
             closePopup();
         });
@@ -435,6 +566,7 @@ function initAppleDateTimePickers() {
 
         // Outside click closes popup
         document.addEventListener('click', (e) => {
+            if (!document.body.contains(e.target)) return;
             if (!wrapper.contains(e.target)) closePopup();
         });
 

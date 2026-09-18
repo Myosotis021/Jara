@@ -97,7 +97,7 @@
                         style="height:44px;{{ $errors->has('priority') ? 'border-color:#ff3b30;' : '' }}"
                     >
                         <option value="menyusul" {{ old('priority', $task->priority) === 'menyusul' ? 'selected' : '' }}>Menyusul / Normal</option>
-                        <option value="penting"  {{ old('priority', $task->priority) === 'penting'  ? 'selected' : '' }}>[!] Penting</option>
+                        <option value="penting"  {{ old('priority', $task->priority) === 'penting'  ? 'selected' : '' }}>Penting</option>
                     </select>
                     @error('priority')
                         <p class="typography-caption" style="color:#ff3b30;margin:4px 0 0;">{{ $message }}</p>

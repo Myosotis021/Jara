@@ -54,7 +54,7 @@
     <div class="apple-card" style="padding:24px;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
             <h2 class="typography-caption-strong" style="color:#7a7a7a;text-transform:uppercase;letter-spacing:0.06em;margin:0;">
-                Progres Tugas Workspace
+                PROGRES TUGAS WORKSPACE
             </h2>
             <div class="typography-body-strong" style="color:#1d1d1f;">
                 {{ $progressPercentage }}%
@@ -243,7 +243,7 @@
                         style="height:44px;{{ $errors->has('priority') ? 'border-color:#ff3b30;' : '' }}"
                     >
                         <option value="menyusul" {{ old('priority', 'menyusul') === 'menyusul' ? 'selected' : '' }}>Menyusul</option>
-                        <option value="penting"  {{ old('priority') === 'penting'  ? 'selected' : '' }}>[!] Penting</option>
+                        <option value="penting"  {{ old('priority') === 'penting'  ? 'selected' : '' }}>Penting</option>
                     </select>
                 </div>
 
@@ -360,7 +360,7 @@
                                     @if ($task->priority === 'penting')
                                         <span class="apple-chip"
                                               style="font-size:11px;padding:2px 8px;font-weight:600;color:#ff3b30;border-color:rgba(255,59,48,0.3);">
-                                            [!] PENTING
+                                            PENTING
                                         </span>
                                     @else
                                         <span class="apple-chip"
@@ -507,12 +507,22 @@
                                         <span style="color:#7a7a7a;font-weight:400;">(Maks. 10 MB — PDF, DOC, DOCX, ZIP, PNG, JPG)</span>
                                     </label>
                                     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+                                        <label for="attachment-{{ $task->id }}" class="apple-btn-secondary-compact" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin:0;white-space:nowrap;">
+                                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                            </svg>
+                                            Pilih Berkas
+                                        </label>
+                                        <span id="file-name-{{ $task->id }}" class="typography-caption" style="color:#7a7a7a;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                            Belum ada berkas dipilih
+                                        </span>
                                         <input type="file"
                                                id="attachment-{{ $task->id }}"
                                                name="attachment"
                                                required
                                                accept=".pdf,.doc,.docx,.zip,.jpg,.jpeg,.png"
-                                               style="flex:1;min-width:0;font-size:13px;color:#7a7a7a;cursor:pointer;">
+                                               style="display:none;"
+                                               onchange="document.getElementById('file-name-{{ $task->id }}').textContent = this.files[0] ? this.files[0].name : 'Belum ada berkas dipilih'">
                                         <button type="submit" class="apple-btn-primary-compact" style="flex-shrink:0;">
                                             Unggah
                                         </button>

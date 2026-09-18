@@ -8,7 +8,7 @@
             &larr; {{ $workspace->name }}
         </a>
         <span class="text-[#e0e0e0]">/</span>
-        <span class="truncate">Edit</span>
+        <span class="truncate">Pengaturan</span>
     </div>
 @endsection
 
@@ -84,6 +84,27 @@
                     Simpan Perubahan
                 </button>
             </div>
+        </form>
+    </div>
+
+    <div class="apple-card p-8 sm:p-10 mt-6" style="border-color:#f5c6c2;">
+        <h2 class="typography-tagline text-[#1d1d1f] m-0">
+            Hapus Workspace
+        </h2>
+        <p class="typography-body text-[#7a7a7a] mt-2 mb-6">
+            Tindakan ini permanen. Seluruh tugas dan file lampiran di dalam workspace ini akan ikut terhapus.
+        </p>
+        <form action="{{ route('workspaces.destroy', $workspace) }}"
+              method="POST"
+              style="margin:0;"
+              data-confirm="Hapus workspace ini? Seluruh tugas dan file lampiran di dalamnya akan ikut terhapus permanen."
+              data-confirm-title="Hapus Workspace"
+              data-confirm-btn="Hapus Workspace">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="apple-btn-primary" style="background-color:#ff3b30;">
+                Hapus Workspace
+            </button>
         </form>
     </div>
 </div>

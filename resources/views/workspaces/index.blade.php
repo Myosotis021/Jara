@@ -18,22 +18,17 @@
     {{-- ================================================================
          HERO HEADER
          ================================================================ --}}
-    <div style="padding-bottom:24px;border-bottom:1px solid #e0e0e0;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;">
-        <div>
-            <span class="apple-chip"
-                  style="font-size:12px;padding:4px 12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;display:inline-flex;">
-                Ruang Kerja Kolaboratif
-            </span>
-            <h1 class="typography-display-md" style="color:#1d1d1f;margin:8px 0 8px;">
-                Workspace & Daftar Tugas Saya
-            </h1>
-            <p class="typography-body" style="color:#7a7a7a;margin:0;max-width:560px;">
-                Kelola ruang kerja proyek, tugas personal, serta delegasi tugas tim di satu platform terpadu.
-            </p>
-        </div>
-        <a href="{{ route('workspaces.create') }}" class="apple-btn-primary">
-            + Buat Workspace
-        </a>
+    <div style="padding-bottom:24px;border-bottom:1px solid #e0e0e0;">
+        <span class="apple-chip"
+              style="font-size:12px;padding:4px 12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;display:inline-flex;">
+            Ruang Kerja Kolaboratif
+        </span>
+        <h1 class="typography-display-md" style="color:#1d1d1f;margin:8px 0 8px;">
+            Workspace & Daftar Tugas Saya
+        </h1>
+        <p class="typography-body" style="color:#7a7a7a;margin:0;max-width:560px;">
+            Kelola ruang kerja proyek, tugas personal, serta delegasi tugas tim di satu platform terpadu.
+        </p>
     </div>
 
     {{-- ================================================================
@@ -73,10 +68,11 @@
             {{-- 3-col grid of store-utility-cards --}}
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
                 @foreach ($myWorkspaces as $workspace)
-                    <div class="apple-card"
-                         style="display:flex;flex-direction:column;justify-content:space-between;transition:border-color 0.12s;"
-                         onmouseenter="this.style.borderColor='#0071e3'"
-                         onmouseleave="this.style.borderColor='#e0e0e0'">
+                    <a href="{{ route('workspaces.show', $workspace) }}"
+                       class="apple-card"
+                       style="display:flex;flex-direction:column;justify-content:space-between;transition:border-color 0.12s;text-decoration:none;color:inherit;cursor:pointer;"
+                       onmouseenter="this.style.borderColor='#0071e3'"
+                       onmouseleave="this.style.borderColor='#e0e0e0'">
                         <div>
                             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
                                 <h3 class="typography-body-strong" style="color:#1d1d1f;word-break:break-word;margin:0;">
@@ -88,37 +84,11 @@
                             </p>
                         </div>
                         <div>
-                            <div style="margin-bottom:16px;">
-                                <span class="apple-chip" style="font-size:12px;padding:4px 10px;font-weight:500;">
-                                    Pemilik: Anda
-                                </span>
-                            </div>
-                            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:16px;border-top:1px solid #f0f0f0;"
-                                 class="typography-caption">
-                                <a href="{{ route('workspaces.show', $workspace) }}" class="apple-btn-primary-compact">
-                                    Buka
-                                </a>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <a href="{{ route('workspaces.edit', $workspace) }}" class="apple-text-link">
-                                        Edit
-                                    </a>
-                                    <form action="{{ route('workspaces.destroy', $workspace) }}"
-                                          method="POST"
-                                          style="display:inline;margin:0;"
-                                          data-confirm="Hapus workspace ini? Seluruh tugas dan file lampiran di dalamnya akan ikut terhapus permanen."
-                                          data-confirm-title="Hapus Workspace"
-                                          data-confirm-btn="Hapus Workspace">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                style="color:#ff3b30;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-size:14px;font-weight:400;">
-                                            Hapus
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
+                            <span class="apple-chip" style="font-size:12px;padding:4px 10px;font-weight:500;">
+                                Pemilik: Anda
+                            </span>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
         @endif
@@ -140,10 +110,11 @@
 
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
                 @foreach ($sharedWorkspaces as $shared)
-                    <div class="apple-card"
-                         style="display:flex;flex-direction:column;justify-content:space-between;transition:border-color 0.12s;"
-                         onmouseenter="this.style.borderColor='#0071e3'"
-                         onmouseleave="this.style.borderColor='#e0e0e0'">
+                    <a href="{{ route('workspaces.show', $shared) }}"
+                       class="apple-card"
+                       style="display:flex;flex-direction:column;justify-content:space-between;transition:border-color 0.12s;text-decoration:none;color:inherit;cursor:pointer;"
+                       onmouseenter="this.style.borderColor='#0071e3'"
+                       onmouseleave="this.style.borderColor='#e0e0e0'">
                         <div>
                             <h3 class="typography-body-strong" style="color:#1d1d1f;word-break:break-word;margin:0 0 8px;">
                                 {{ $shared->name }}
@@ -153,18 +124,11 @@
                             </p>
                         </div>
                         <div>
-                            <div style="margin-bottom:16px;">
-                                <span class="apple-chip" style="font-size:12px;padding:4px 10px;font-weight:500;">
-                                    Anggota Kolaborasi
-                                </span>
-                            </div>
-                            <div style="padding-top:16px;border-top:1px solid #f0f0f0;">
-                                <a href="{{ route('workspaces.show', $shared) }}" class="apple-btn-primary-compact">
-                                    Buka
-                                </a>
-                            </div>
+                            <span class="apple-chip" style="font-size:12px;padding:4px 10px;font-weight:500;">
+                                Anggota Kolaborasi
+                            </span>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
         </div>
