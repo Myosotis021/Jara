@@ -1402,21 +1402,32 @@ a.apple-chip:active, button.apple-chip:active {
 
 .apple-select-menu {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + 6px);
     left: 0;
     right: 0;
-    z-index: 100;
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
+    z-index: 120;
+    background-color: rgba(255, 255, 255, 0.98);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.12);
     border-radius: 14px;
-    padding: 4px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
-    display: none;
+    padding: 6px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px) scale(0.97);
+    transform-origin: top center;
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.22s ease;
 }
 
 .apple-select-menu.is-open {
-    display: block;
-    animation: applePopupFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
 }
 
 .apple-select-option {
@@ -1424,23 +1435,199 @@ a.apple-chip:active, button.apple-chip:active {
     align-items: center;
     justify-content: space-between;
     padding: 10px 14px;
-    font-size: 17px;
+    font-size: 14px;
     font-family: var(--font-sans);
-    letter-spacing: -0.374px;
-    border-radius: 10px;
+    letter-spacing: -0.2px;
+    border-radius: 8px;
     color: #1d1d1f;
     cursor: pointer;
-    transition: background-color 0.1s ease;
+    transition: background-color 0.14s ease, transform 0.1s ease, color 0.14s ease;
 }
 
 .apple-select-option:hover {
     background-color: #f5f5f7;
 }
 
+.apple-select-option:active {
+    transform: scale(0.985);
+}
+
 .apple-select-option.is-selected {
     background-color: #f0f5fa;
     color: #0066cc;
     font-weight: 600;
+}
+
+/* =======================================================================
+   3b. Apple Searchable Member Combobox with Smooth Dropdown Animation
+   ======================================================================= */
+.apple-member-search-container {
+    position: relative;
+    width: 100%;
+}
+
+.apple-member-trigger {
+    height: 42px;
+    padding: 0 14px;
+    background-color: #ffffff;
+    border: 1px solid #d2d2d7;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+    user-select: none;
+}
+
+.apple-member-trigger:hover {
+    border-color: #0071e3;
+    background-color: #fafafc;
+}
+
+.apple-member-trigger.is-active {
+    border-color: #0071e3;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.18);
+}
+
+.apple-member-trigger.is-active .apple-member-arrow {
+    transform: rotate(180deg);
+}
+
+.apple-member-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 150;
+    background-color: rgba(255, 255, 255, 0.98);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 14px;
+    padding: 8px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px) scale(0.97);
+    transform-origin: top center;
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.25s ease;
+}
+
+.apple-member-menu.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.apple-member-search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f5f5f7;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 7px 10px;
+    margin-bottom: 6px;
+    transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.apple-member-search-box:focus-within {
+    background-color: #ffffff;
+    border-color: #0071e3;
+    box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.18);
+}
+
+.apple-member-search-input {
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-family: inherit;
+    color: #1d1d1f;
+    width: 100%;
+}
+
+.apple-member-search-input::placeholder {
+    color: #86868b;
+}
+
+.apple-member-clear-btn {
+    background: none;
+    border: none;
+    color: #86868b;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 50%;
+    transition: color 0.12s ease;
+}
+
+.apple-member-clear-btn:hover {
+    color: #1d1d1f;
+}
+
+.apple-member-options-list {
+    max-height: 220px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.apple-member-options-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.apple-member-options-list::-webkit-scrollbar-thumb {
+    background: #d2d2d7;
+    border-radius: 10px;
+}
+
+.apple-member-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.14s ease, transform 0.08s ease;
+    user-select: none;
+}
+
+.apple-member-option:hover {
+    background-color: #f5f5f7;
+}
+
+.apple-member-option:active {
+    transform: scale(0.985);
+}
+
+.apple-member-option.is-selected {
+    background-color: #f0f5fa;
+}
+
+.apple-member-option.is-selected .apple-member-opt-name {
+    color: #0066cc;
+}
+
+.apple-member-loading,
+.apple-member-empty {
+    padding: 18px 12px;
+    text-align: center;
+    font-size: 12px;
+    color: #7a7a7a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 /* =======================================================================

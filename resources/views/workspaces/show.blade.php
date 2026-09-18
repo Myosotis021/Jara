@@ -433,22 +433,90 @@
                 {{-- Invite Form (Owner Only) --}}
                 @if (auth()->id() === $workspace->user_id)
                     <form action="{{ route('workspaces.members.store', $workspace->id) }}" method="POST"
-                          style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;padding:12px;background-color:#fafafc;border:1px solid #e0e0e0;border-radius:10px;">
+                          id="invite-member-form"
+                          style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;padding:14px;background-color:#fafafc;border:1px solid #e0e0e0;border-radius:12px;">
                         @csrf
-                        <label for="user_id" class="typography-caption-strong" style="color:#1d1d1f;display:block;font-size:12px;">
-                            Undang Pengguna Terdaftar
-                        </label>
-                        <select name="user_id" id="user_id" required class="apple-custom-select apple-input" style="height:40px;">
-                            <option value="">— Pilih Pengguna —</option>
-                            @foreach ($availableUsers as $candidate)
-                                <option value="{{ $candidate->id }}">{{ $candidate->name }} ({{ $candidate->email }})</option>
-                            @endforeach
-                        </select>
+                        <div>
+                            <label class="typography-caption-strong" style="color:#1d1d1f;display:block;font-size:12px;margin-bottom:6px;">
+                                Tambah Anggota Tim
+                            </label>
+
+                            {{-- Apple Searchable Member Combobox with Live Database Search --}}
+                            <div class="apple-member-search-container"
+                                 id="apple-member-combobox"
+                                 data-search-url="{{ route('workspaces.members.search', $workspace->id) }}">
+                                <input type="hidden" name="user_id" id="invite_user_id" value="{{ old('user_id') }}">
+                                <input type="hidden" name="email" id="invite_user_email" value="{{ old('email') }}">
+
+                                {{-- Trigger Button --}}
+                                <div class="apple-member-trigger" id="apple-member-trigger" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                                    <div style="display:flex;align-items:center;gap:8px;overflow:hidden;flex:1;min-width:0;">
+                                        <svg width="15" height="15" fill="none" stroke="#7a7a7a" viewBox="0 0 24 24" style="flex-shrink:0;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m16-10a4 4 0 11-8 0 4 4 0 018 0zM20 8v6M23 11h-6"/>
+                                        </svg>
+                                        <span class="apple-member-selected-label" id="apple-member-label" style="font-size:13px;color:#7a7a7a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                            Cari nama atau email pengguna…
+                                        </span>
+                                    </div>
+                                    <svg class="apple-member-arrow" width="14" height="14" fill="none" stroke="#7a7a7a" viewBox="0 0 24 24" style="flex-shrink:0;transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+
+                                {{-- Smooth Animated Dropdown Menu with Live Database Search --}}
+                                <div class="apple-member-menu" id="apple-member-menu" role="listbox">
+                                    {{-- Search Box inside Dropdown --}}
+                                    <div class="apple-member-search-box">
+                                        <svg width="14" height="14" fill="none" stroke="#7a7a7a" viewBox="0 0 24 24" style="flex-shrink:0;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                        </svg>
+                                        <input type="text"
+                                               class="apple-member-search-input"
+                                               id="apple-member-search-input"
+                                               placeholder="Ketik email atau nama di database…"
+                                               autocomplete="off"
+                                               spellcheck="false">
+                                        <button type="button" class="apple-member-clear-btn" id="apple-member-clear-btn" style="display:none;" title="Bersihkan">×</button>
+                                    </div>
+
+                                    {{-- Options List --}}
+                                    <div class="apple-member-options-list" id="apple-member-options-list">
+                                        @forelse ($availableUsers as $candidate)
+                                            <div class="apple-member-option"
+                                                 data-id="{{ $candidate->id }}"
+                                                 data-name="{{ $candidate->name }}"
+                                                 data-email="{{ $candidate->email }}">
+                                                <span class="avatar-initials" style="width:24px;height:24px;font-size:10px;flex-shrink:0;">
+                                                    {{ strtoupper(substr($candidate->name, 0, 2)) }}
+                                                </span>
+                                                <div style="overflow:hidden;flex:1;min-width:0;">
+                                                    <div class="apple-member-opt-name" style="font-size:13px;font-weight:600;color:#1d1d1f;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                                        {{ $candidate->name }}
+                                                    </div>
+                                                    <div class="apple-member-opt-email" style="font-size:11px;color:#7a7a7a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                                        {{ $candidate->email }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @empty
+                                            <div class="apple-member-empty">
+                                                Belum ada calon anggota lain yang tersedia.
+                                            </div>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         @error('user_id')
                             <p class="typography-caption" style="color:#ff3b30;margin:0;font-size:12px;">{{ $message }}</p>
                         @enderror
-                        <button type="submit" class="apple-btn-primary-compact" style="height:36px;width:100%;font-size:12px;">
-                            + Undang ke Workspace
+                        @error('email')
+                            <p class="typography-caption" style="color:#ff3b30;margin:0;font-size:12px;">{{ $message }}</p>
+                        @enderror
+
+                        <button type="submit" id="invite-submit-btn" class="apple-btn-primary-compact" style="height:36px;width:100%;font-size:12px;">
+                            Undang ke Workspace
                         </button>
                     </form>
                 @endif

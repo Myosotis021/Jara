@@ -130,4 +130,78 @@ class WorkspaceMemberTest extends TestCase
 
         $response->assertOk();
     }
+
+    public function test_owner_can_search_users_by_email_from_database(): void
+    {
+        $owner = User::factory()->create();
+        $targetUser = User::factory()->create([
+            'name' => 'Budi Santoso',
+            'email' => 'budisantoso@example.com',
+        ]);
+        $otherUser = User::factory()->create([
+            'name' => 'Joko',
+            'email' => 'joko@domain.org',
+        ]);
+
+        $workspace = Workspace::create([
+            'user_id' => $owner->id,
+            'name' => 'Workspace Search Test',
+        ]);
+
+        $response = $this->actingAs($owner)->getJson(route('workspaces.members.search', [
+            'workspace' => $workspace->id,
+            'q' => 'budisantoso',
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            'id' => $targetUser->id,
+            'name' => 'Budi Santoso',
+            'email' => 'budisantoso@example.com',
+        ]);
+        $response->assertJsonMissing([
+            'email' => 'joko@domain.org',
+        ]);
+    }
+
+    public function test_owner_can_invite_member_by_email(): void
+    {
+        $owner = User::factory()->create();
+        $candidate = User::factory()->create(['email' => 'calon.anggota@jara.local']);
+
+        $workspace = Workspace::create([
+            'user_id' => $owner->id,
+            'name' => 'Workspace Email Invite',
+        ]);
+
+        $response = $this->actingAs($owner)->post(route('workspaces.members.store', $workspace->id), [
+            'email' => 'calon.anggota@jara.local',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('workspace_members', [
+            'workspace_id' => $workspace->id,
+            'user_id' => $candidate->id,
+        ]);
+    }
+
+    public function test_non_owner_cannot_search_users(): void
+    {
+        $owner = User::factory()->create();
+        $stranger = User::factory()->create();
+
+        $workspace = Workspace::create([
+            'user_id' => $owner->id,
+            'name' => 'Workspace Private',
+        ]);
+
+        $response = $this->actingAs($stranger)->getJson(route('workspaces.members.search', [
+            'workspace' => $workspace->id,
+            'q' => 'test',
+        ]));
+
+        $response->assertStatus(403);
+    }
 }

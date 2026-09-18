@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('workspaces', WorkspaceController::class);
 
     // Workspace Members Routes (PRD 3 - Kolaborasi Workspace)
+    Route::get('/workspaces/{workspace}/members/search', [WorkspaceMemberController::class, 'search'])
+        ->name('workspaces.members.search');
     Route::post('/workspaces/{workspace}/members', [WorkspaceMemberController::class, 'store'])
         ->name('workspaces.members.store');
     Route::delete('/workspaces/{workspace}/members/{user}', [WorkspaceMemberController::class, 'destroy'])

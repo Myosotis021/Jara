@@ -28,7 +28,7 @@
             </div>
             <div>
                 <a href="{{ route('workspaces.create') }}" class="apple-btn-primary">
-                    + Buat Workspace Baru
+                    Buat Workspace Baru
                 </a>
             </div>
         </div>
@@ -65,7 +65,7 @@
                     Kelompokkan tugas kuliah, kantor, atau proyek Anda dalam satu wadah terstruktur.
                 </p>
                 <a href="{{ route('workspaces.create') }}" class="apple-btn-primary">
-                    + Buat Workspace Baru
+                    Buat Workspace Baru
                 </a>
             </div>
 
@@ -94,9 +94,6 @@
                         <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid #f5f5f7;">
                             <span class="apple-chip" style="font-size:11px;padding:3px 8px;font-weight:600;color:#0066cc;border-color:rgba(0,102,204,0.2);">
                                 Pemilik: Anda
-                            </span>
-                            <span style="font-size:12px;color:#7a7a7a;">
-                                Buka &rarr;
                             </span>
                         </div>
                     </a>
@@ -142,9 +139,6 @@
                         <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid #f5f5f7;">
                             <span class="apple-chip" style="font-size:11px;padding:3px 8px;font-weight:500;">
                                 Anggota Kolaborasi
-                            </span>
-                            <span style="font-size:12px;color:#7a7a7a;">
-                                Buka &rarr;
                             </span>
                         </div>
                     </a>
