@@ -3,98 +3,142 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Tailwind CDN fallback & Vite assets -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Masuk — JARA</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles & Scripts via Vite -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 font-sans antialiased">
-    <div class="w-full max-w-md">
-        {{-- Card --}}
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 p-8">
-            {{-- Branding --}}
-            <div class="text-center mb-6">
-                <h1 class="text-2xl font-bold text-blue-600 tracking-tight">JARA</h1>
-                <p class="text-sm text-gray-500 mt-1">Sistem Manajemen & Upload Tugas Tim/Pribadi</p>
+<body class="bg-[#f5f5f7] text-[#1d1d1f] antialiased min-h-screen flex flex-col font-sans">
+    <!-- Apple global-nav (44px, surface-black) -->
+    <header class="apple-global-nav w-full">
+        <div class="max-w-[1440px] mx-auto h-[44px] px-4 sm:px-8 flex items-center justify-between">
+            <a href="/" class="font-semibold text-white tracking-tight text-[13px] hover:text-[#cccccc] transition">
+                JARA
+            </a>
+            <span class="text-[#cccccc] text-[12px]">
+                Sistem Manajemen Workspace &amp; Tugas
+            </span>
+        </div>
+    </header>
+
+    <!-- Center Card Container -->
+    <main class="flex-grow flex items-center justify-center px-4 py-12 sm:py-16">
+        <div class="w-full max-w-[440px]">
+            <!-- Store Utility Card: White, 18px radius, hairline border, no shadow -->
+            <div class="apple-card p-8 sm:p-10">
+                <!-- Branding & Headlines -->
+                <div class="text-center mb-8">
+                    <span class="typography-caption text-[#7a7a7a] uppercase tracking-wider block mb-1">
+                        Autentikasi Akun
+                    </span>
+                    <h1 class="typography-display-md text-[#1d1d1f] tracking-tight">
+                        Masuk ke JARA
+                    </h1>
+                    <p class="typography-caption text-[#7a7a7a] mt-2">
+                        Kelola tugas, pantau progres tim, dan simpan berkas lampiran di satu tempat.
+                    </p>
+                </div>
+
+                <!-- Flash Alerts -->
+                @if(session('success'))
+                    <div class="mb-5 p-3.5 rounded-[11px] bg-white border border-[#e0e0e0] flex items-center space-x-2.5">
+                        <span class="w-2 h-2 rounded-full bg-[#0066cc] shrink-0"></span>
+                        <span class="typography-caption text-[#1d1d1f]">{{ session('success') }}</span>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="mb-5 p-3.5 rounded-[11px] bg-white border border-[#e0e0e0] flex items-center space-x-2.5">
+                        <span class="w-2 h-2 rounded-full bg-[#ff3b30] shrink-0"></span>
+                        <span class="typography-caption text-[#1d1d1f]">{{ session('error') }}</span>
+                    </div>
+                @endif
+
+                <!-- Login Form -->
+                <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                    @csrf
+
+                    <!-- Email Input -->
+                    <div>
+                        <label for="email" class="block typography-caption-strong text-[#1d1d1f] mb-1.5">
+                            Alamat Email
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            required
+                            maxlength="255"
+                            autocomplete="email"
+                            autofocus
+                            placeholder="nama@email.com"
+                            class="apple-input {{ $errors->has('email') ? '!border-[#ff3b30]' : '' }}"
+                        >
+                        @error('email')
+                            <p class="typography-caption text-[#ff3b30] mt-1.5">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Password Input -->
+                    <div>
+                        <label for="password" class="block typography-caption-strong text-[#1d1d1f] mb-1.5">
+                            Kata Sandi
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            required
+                            autocomplete="current-password"
+                            placeholder="••••••••"
+                            class="apple-input {{ $errors->has('password') ? '!border-[#ff3b30]' : '' }}"
+                        >
+                        @error('password')
+                            <p class="typography-caption text-[#ff3b30] mt-1.5">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Remember Me Option -->
+                    <div class="flex items-center justify-between pt-1">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                name="remember" 
+                                value="1"
+                                class="w-4 h-4 rounded-[4px] border-[#e0e0e0] text-[#0066cc] focus:ring-[#0071e3]"
+                            >
+                            <span class="typography-caption text-[#333333]">Ingat saya di perangkat ini</span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button: button-primary (Action Blue Pill, active scale 0.95) -->
+                    <div class="pt-2">
+                        <button type="submit" class="apple-btn-primary w-full text-center">
+                            Masuk
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            {{-- Flash Alert --}}
-            @if(session('success'))
-                <div class="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-2.5 rounded-lg mb-4">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-2.5 rounded-lg mb-4">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            {{-- Login Form --}}
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-
-                {{-- Email --}}
-                <div class="mb-4">
-                    <label for="email" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                        Email
-                    </label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value="{{ old('email') }}"
-                        required
-                        maxlength="255"
-                        autocomplete="email"
-                        autofocus
-                        class="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-blue-500 transition
-                               {{ $errors->has('email') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500' }}"
-                        placeholder="user@example.com"
-                    >
-                    @error('email')
-                        <p class="text-xs text-red-600 mt-1 font-medium">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Password --}}
-                <div class="mb-4">
-                    <label for="password" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                        Kata Sandi
-                    </label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        required
-                        autocomplete="current-password"
-                        class="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-blue-500 transition
-                               {{ $errors->has('password') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500' }}"
-                        placeholder="••••••••"
-                    >
-                    @error('password')
-                        <p class="text-xs text-red-600 mt-1 font-medium">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Remember Me --}}
-                <div class="mb-6">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" name="remember" value="1"
-                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <span class="text-sm text-gray-600">Ingat Saya</span>
-                    </label>
-                </div>
-
-                {{-- Submit --}}
-                <button type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-150 ease-in-out shadow-sm cursor-pointer">
-                    Masuk
-                </button>
-            </form>
+            <!-- Footer Notice -->
+            <div class="text-center mt-6 text-[#7a7a7a] typography-fine-print">
+                Registrasi akun tertutup dan dikelola langsung oleh Administrator.
+            </div>
         </div>
-    </div>
+    </main>
+
+    <!-- Bottom Mini-Footer -->
+    <footer class="py-6 text-center text-[#7a7a7a] typography-fine-print border-t border-[#e0e0e0]">
+        &copy; {{ date('Y') }} JARA. Hak Cipta Dilindungi Undang-Undang.
+    </footer>
 </body>
 </html>

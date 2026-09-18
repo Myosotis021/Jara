@@ -2,149 +2,173 @@
 
 @section('title', $workspace->name . ' — JARA')
 
-@section('content')
-<div class="space-y-6">
-    <!-- Back to workspaces navigation -->
-    <div>
-        <a href="{{ route('workspaces.index') }}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 transition">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Kembali ke Workspaces
+@section('subnav_title')
+    <div style="display:flex;align-items:center;gap:12px;overflow:hidden;">
+        <a href="{{ route('workspaces.index') }}"
+           style="font-size:14px;color:#7a7a7a;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:color 0.12s;">
+            &larr; Workspaces
         </a>
+        <span style="color:#e0e0e0;flex-shrink:0;">/</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $workspace->name }}</span>
     </div>
+@endsection
 
-    <!-- Workspace Header -->
-    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded">
-                    Workspace
+@section('subnav_actions')
+    @if(auth()->id() === $workspace->user_id)
+        <a href="{{ route('workspaces.edit', $workspace) }}" class="apple-btn-secondary-compact">
+            Pengaturan
+        </a>
+    @endif
+@endsection
+
+@section('content')
+<div style="display:flex;flex-direction:column;gap:24px;">
+
+    {{-- ================================================================
+         1. WORKSPACE HERO CARD
+         ================================================================ --}}
+    <div class="apple-card" style="padding:24px;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;">
+            <div style="flex:1;min-width:0;">
+                <span class="apple-chip" style="font-size:12px;padding:4px 12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;display:inline-flex;">
+                    Ruang Kerja
                 </span>
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight mt-2 break-words">
+                <h1 class="typography-display-lg" style="color:#1d1d1f;margin:8px 0 8px;word-break:break-word;">
                     {{ $workspace->name }}
                 </h1>
-                <p class="text-sm text-gray-500 mt-1 break-words">
-                    {{ $workspace->description ?: 'Tidak ada deskripsi.' }}
+                <p class="typography-body" style="color:#7a7a7a;margin:0;word-break:break-word;max-width:640px;">
+                    {{ $workspace->description ?: 'Tidak ada keterangan deskripsi tambahan untuk workspace ini.' }}
                 </p>
             </div>
-            <div class="flex items-center space-x-2 text-xs text-gray-500 shrink-0">
-                <span class="px-2.5 py-1 rounded bg-gray-100 font-medium">
-                    Pemilik: {{ $workspace->user_id === auth()->id() ? 'Anda' : ($workspace->owner->name ?? 'Lain') }}
+            <div style="flex-shrink:0;">
+                <span class="apple-chip" style="font-size:13px;padding:6px 14px;font-weight:500;">
+                    Pemilik: {{ $workspace->user_id === auth()->id() ? 'Anda' : ($workspace->owner->name ?? 'Pengguna Lain') }}
                 </span>
             </div>
         </div>
     </div>
 
-    <!-- Monitoring Progres Card -->
-    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-xs">
-        <div class="flex items-center justify-between">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-gray-700">
-                PROGRES TUGAS WORKSPACE
+    {{-- ================================================================
+         2. PROGRES TUGAS
+         ================================================================ --}}
+    <div class="apple-card" style="padding:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+            <h2 class="typography-caption-strong" style="color:#7a7a7a;text-transform:uppercase;letter-spacing:0.06em;margin:0;">
+                Progres Tugas Workspace
             </h2>
-            <span class="text-sm font-bold text-gray-900">
-                {{ $progressPercentage }}% <span class="text-xs font-normal text-gray-500">({{ $completedTasks }} dari {{ $totalTasks }} selesai)</span>
-            </span>
+            <div class="typography-body-strong" style="color:#1d1d1f;">
+                {{ $progressPercentage }}%
+                <span class="typography-caption" style="color:#7a7a7a;font-weight:400;">
+                    ({{ $completedTasks }} dari {{ $totalTasks }} selesai)
+                </span>
+            </div>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden mt-3">
-            <div class="bg-green-600 h-3 rounded-full transition-all duration-300" style="width: {{ $progressPercentage }}%"></div>
+        <!-- Progress bar: 8px height (multiple of 4) -->
+        <div style="width:100%;background-color:#f0f0f0;border-radius:9999px;height:8px;overflow:hidden;">
+            <div style="background-color:#0066cc;height:8px;border-radius:9999px;width:{{ $progressPercentage }}%;transition:width 0.3s ease;"></div>
         </div>
 
-        <div class="text-xs font-medium text-gray-500 mt-3 flex flex-wrap gap-x-4 gap-y-1">
-            <span class="text-green-700 font-semibold">{{ $completedTasks }} Selesai</span>
+        <!-- Counters -->
+        <div class="typography-caption" style="color:#7a7a7a;margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+            <span style="color:#0066cc;font-weight:600;">{{ $completedTasks }} Selesai</span>
             <span>&bull;</span>
-            <span class="text-gray-700">{{ $totalTasks - $completedTasks }} Belum Selesai</span>
+            <span style="color:#1d1d1f;">{{ $totalTasks - $completedTasks }} Belum Selesai</span>
             <span>&bull;</span>
-            <span class="text-red-700 font-semibold">{{ $pentingTasks }} Penting</span>
+            <span style="color:#ff3b30;font-weight:600;">{{ $pentingTasks }} Penting</span>
         </div>
     </div>
 
-    <!-- Section Anggota Tim Kolaborasi (PRD 3) -->
-    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-xs">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                Anggota Tim Kolaborasi (Total: {{ 1 + $workspace->members->count() }} Orang)
+    {{-- ================================================================
+         3. ANGGOTA TIM KOLABORASI
+         ================================================================ --}}
+    <div class="apple-card" style="padding:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <h2 class="typography-tagline" style="color:#1d1d1f;margin:0;">
+                Anggota Tim ({{ 1 + $workspace->members->count() }} Orang)
             </h2>
         </div>
 
-        <!-- Form Undang Anggota (Khusus Pemilik Workspace) -->
+        {{-- Invite Form (owner only) --}}
         @if (auth()->id() === $workspace->user_id)
-            <form action="{{ route('workspaces.members.store', $workspace->id) }}" method="POST" class="flex flex-col sm:flex-row gap-3 items-end mb-5 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
+            <form action="{{ route('workspaces.members.store', $workspace->id) }}" method="POST"
+                  style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:20px;padding:16px;background-color:#fafafc;border:1px solid #e0e0e0;border-radius:12px;">
                 @csrf
-                <div class="w-full sm:w-80">
-                    <label for="user_id" class="block text-xs font-semibold text-gray-700 mb-1">Undang Pengguna Terdaftar</label>
-                    <select name="user_id" id="user_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500">
-                        <option value="">-- Pilih Pengguna --</option>
+                <div style="flex:1;min-width:200px;">
+                    <label for="user_id" class="typography-caption-strong" style="color:#1d1d1f;display:block;margin-bottom:6px;">
+                        Undang Pengguna Terdaftar
+                    </label>
+                    <select name="user_id" id="user_id" required class="apple-custom-select apple-input" style="height:44px;">
+                        <option value="">— Pilih Pengguna —</option>
                         @foreach ($availableUsers as $candidate)
                             <option value="{{ $candidate->id }}">{{ $candidate->name }} ({{ $candidate->email }})</option>
                         @endforeach
                     </select>
                     @error('user_id')
-                        <p class="text-xs text-red-600 mt-1 font-medium">{{ $message }}</p>
+                        <p class="typography-caption" style="color:#ff3b30;margin:4px 0 0;">{{ $message }}</p>
                     @enderror
                 </div>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition whitespace-nowrap cursor-pointer">
+                <button type="submit" class="apple-btn-primary-compact" style="height:44px;white-space:nowrap;">
                     + Undang ke Workspace
                 </button>
             </form>
         @endif
 
-        <!-- Tabel Daftar Anggota Tim -->
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+        {{-- Member table --}}
+        <div style="overflow-x:auto;">
+            <table style="width:100%;text-align:left;border-collapse:collapse;" class="typography-caption">
                 <thead>
-                    <tr class="text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
-                        <th class="py-2.5 px-3 font-semibold">Nama</th>
-                        <th class="py-2.5 px-3 font-semibold">Email</th>
-                        <th class="py-2.5 px-3 font-semibold">Peran</th>
-                        <th class="py-2.5 px-3 font-semibold">Aksi</th>
+                    <tr style="color:#7a7a7a;text-transform:uppercase;letter-spacing:0.04em;border-bottom:1px solid #e0e0e0;">
+                        <th style="padding:12px 16px;font-weight:600;">Nama</th>
+                        <th style="padding:12px 16px;font-weight:600;">Email</th>
+                        <th style="padding:12px 16px;font-weight:600;">Peran</th>
+                        <th style="padding:12px 16px;font-weight:600;text-align:right;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
-                    <!-- Baris Pemilik Workspace -->
-                    <tr>
-                        <td class="py-2.5 px-3 font-medium text-gray-900">
+                <tbody>
+                    {{-- Owner row --}}
+                    <tr style="border-bottom:1px solid #f0f0f0;">
+                        <td style="padding:16px;font-weight:600;color:#1d1d1f;">
                             {{ $workspace->owner->name ?? 'Pemilik' }}
                         </td>
-                        <td class="py-2.5 px-3 text-gray-500">
-                            {{ $workspace->owner->email ?? '-' }}
+                        <td style="padding:16px;color:#7a7a7a;">
+                            {{ $workspace->owner->email ?? '—' }}
                         </td>
-                        <td class="py-2.5 px-3">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">PEMILIK</span>
+                        <td style="padding:16px;">
+                            <span class="apple-chip" style="font-size:11px;padding:3px 10px;font-weight:600;color:#0066cc;border-color:#0066cc;">
+                                PEMILIK
+                            </span>
                         </td>
-                        <td class="py-2.5 px-3 text-gray-400">-</td>
+                        <td style="padding:16px;text-align:right;color:#7a7a7a;">—</td>
                     </tr>
 
-                    <!-- Baris Anggota Kolaborasi -->
+                    {{-- Member rows --}}
                     @foreach ($workspace->members as $member)
-                        <tr>
-                            <td class="py-2.5 px-3 font-medium text-gray-900">
-                                {{ $member->name }}
+                        <tr style="border-bottom:1px solid #f0f0f0;">
+                            <td style="padding:16px;font-weight:500;color:#1d1d1f;">{{ $member->name }}</td>
+                            <td style="padding:16px;color:#7a7a7a;">{{ $member->email }}</td>
+                            <td style="padding:16px;">
+                                <span class="apple-chip" style="font-size:11px;padding:3px 10px;font-weight:500;color:#7a7a7a;">
+                                    ANGGOTA
+                                </span>
                             </td>
-                            <td class="py-2.5 px-3 text-gray-500">
-                                {{ $member->email }}
-                            </td>
-                            <td class="py-2.5 px-3">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">ANGGOTA</span>
-                            </td>
-                            <td class="py-2.5 px-3">
+                            <td style="padding:16px;text-align:right;">
                                 @if (auth()->id() === $workspace->user_id)
-                                    <form action="{{ route('workspaces.members.destroy', [$workspace->id, $member->id]) }}" 
-                                          method="POST" 
-                                          onsubmit="return confirm('Apakah Anda yakin ingin mengeluarkan anggota ini dari workspace?')">
+                                    <form action="{{ route('workspaces.members.destroy', [$workspace->id, $member->id]) }}"
+                                          method="POST"
+                                          style="display:inline;margin:0;"
+                                          data-confirm="Apakah Anda yakin ingin mengeluarkan anggota ini dari workspace?"
+                                          data-confirm-title="Keluarkan Anggota"
+                                          data-confirm-btn="Keluarkan">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-800 font-medium hover:underline cursor-pointer">
+                                        <button type="submit"
+                                                style="color:#ff3b30;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-size:14px;font-weight:400;">
                                             Keluarkan
                                         </button>
                                     </form>
                                 @else
-                                    <span class="text-gray-400">-</span>
+                                    <span style="color:#7a7a7a;">—</span>
                                 @endif
                             </td>
                         </tr>
@@ -154,84 +178,96 @@
         </div>
     </div>
 
-    <!-- Form Tambah Tugas Baru ("Kaya Nulis Biasa") -->
-    <div class="bg-white p-5 rounded-xl border border-blue-100 shadow-xs">
-        <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-3">
+    {{-- ================================================================
+         4. FORM TAMBAH TUGAS BARU
+         ================================================================ --}}
+    <div class="apple-card" style="padding:24px;">
+        <h3 class="typography-tagline" style="color:#1d1d1f;margin:0 0 20px;">
             Tambah Tugas Baru
         </h3>
 
-        <form action="{{ route('workspaces.tasks.store', $workspace) }}" method="POST" class="space-y-3">
+        <form action="{{ route('workspaces.tasks.store', $workspace) }}" method="POST"
+              style="display:flex;flex-direction:column;gap:16px;">
             @csrf
 
-            <!-- Input Judul Tugas -->
+            {{-- Judul --}}
             <div>
+                <label for="title" class="typography-caption-strong" style="color:#1d1d1f;display:block;margin-bottom:6px;">
+                    Judul Tugas <span style="color:#ff3b30;">*</span>
+                </label>
                 <input
                     type="text"
+                    id="title"
                     name="title"
                     value="{{ old('title') }}"
                     required
-                    placeholder="Tulis judul tugas apa yang perlu dikerjakan..."
-                    class="w-full px-3.5 py-2.5 border rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-blue-500 transition
-                           {{ $errors->has('title') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500' }}"
+                    placeholder="Tulis judul tugas apa yang perlu dikerjakan…"
+                    class="apple-input {{ $errors->has('title') ? '' : '' }}"
+                    style="{{ $errors->has('title') ? 'border-color:#ff3b30;' : '' }}"
                 >
                 @error('title')
-                    <p class="text-xs text-red-600 mt-1 font-medium">{{ $message }}</p>
+                    <p class="typography-caption" style="color:#ff3b30;margin:4px 0 0;">{{ $message }}</p>
                 @enderror
             </div>
 
-            <!-- Input Catatan/Deskripsi Tambahan -->
+            {{-- Catatan --}}
             <div>
+                <label for="description" class="typography-caption-strong" style="color:#1d1d1f;display:block;margin-bottom:6px;">
+                    Catatan atau Detail Tugas <span style="color:#7a7a7a;font-weight:400;">(Opsional)</span>
+                </label>
                 <textarea
+                    id="description"
                     name="description"
-                    rows="2"
-                    placeholder="Tulis catatan atau detail tambahan tugas di sini (opsional)..."
-                    class="w-full px-3.5 py-2 border rounded-lg text-xs text-gray-700 focus:outline-none focus:ring-2 focus:border-blue-500 transition
-                           {{ $errors->has('description') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500' }}"
+                    rows="3"
+                    placeholder="Tulis catatan atau detail tambahan tugas di sini…"
+                    class="apple-input-box"
+                    style="{{ $errors->has('description') ? 'border-color:#ff3b30;' : '' }}"
                 >{{ old('description') }}</textarea>
                 @error('description')
-                    <p class="text-xs text-red-600 mt-1 font-medium">{{ $message }}</p>
+                    <p class="typography-caption" style="color:#ff3b30;margin:4px 0 0;">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end pt-1">
-                <!-- Dropdown Prioritas -->
+            {{-- Prioritas, Tenggat, Submit (3-col grid) --}}
+            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:flex-end;">
+                {{-- Prioritas --}}
                 <div>
-                    <label for="priority" class="block text-xs font-semibold text-gray-600 mb-1">
-                        Prioritas:
+                    <label for="priority" class="typography-caption-strong" style="color:#1d1d1f;display:block;margin-bottom:6px;">
+                        Prioritas
                     </label>
                     <select
                         id="priority"
                         name="priority"
                         required
-                        class="w-full px-3 py-2 border rounded-lg text-xs text-gray-800 focus:outline-none focus:ring-2 focus:border-blue-500 bg-white
-                               {{ $errors->has('priority') ? 'border-red-500' : 'border-gray-300' }}"
+                        class="apple-custom-select apple-input"
+                        style="height:44px;{{ $errors->has('priority') ? 'border-color:#ff3b30;' : '' }}"
                     >
-                        <option value="penting" {{ old('priority') === 'penting' ? 'selected' : '' }}>[!] Penting</option>
                         <option value="menyusul" {{ old('priority', 'menyusul') === 'menyusul' ? 'selected' : '' }}>Menyusul</option>
+                        <option value="penting"  {{ old('priority') === 'penting'  ? 'selected' : '' }}>[!] Penting</option>
                     </select>
                 </div>
 
-                <!-- Input Tenggat Waktu -->
+                {{-- Tenggat Waktu: custom Apple datetime picker --}}
                 <div>
-                    <label for="due_date" class="block text-xs font-semibold text-gray-600 mb-1">
-                        Tenggat Waktu:
+                    <label class="typography-caption-strong" style="color:#1d1d1f;display:block;margin-bottom:6px;">
+                        Tenggat Waktu
                     </label>
                     <input
                         type="datetime-local"
                         id="due_date"
                         name="due_date"
                         value="{{ old('due_date') }}"
-                        class="w-full px-3 py-1.5 border rounded-lg text-xs text-gray-800 focus:outline-none focus:ring-2 focus:border-blue-500 bg-white
-                               {{ $errors->has('due_date') ? 'border-red-500' : 'border-gray-300' }}"
+                        class="apple-datetime-input"
+                        style="{{ $errors->has('due_date') ? 'border-color:#ff3b30;' : '' }}"
                     >
+                    @error('due_date')
+                        <p class="typography-caption" style="color:#ff3b30;margin:4px 0 0;">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <!-- Tombol Submit -->
+                {{-- Submit --}}
                 <div>
-                    <button
-                        type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-xs transition duration-150 ease-in-out shadow-xs cursor-pointer"
-                    >
+                    <button type="submit" class="apple-btn-primary" style="height:44px;width:100%;">
                         + Tambah Tugas
                     </button>
                 </div>
@@ -239,194 +275,211 @@
         </form>
     </div>
 
-    <!-- Section Daftar Tugas -->
-    <div class="space-y-4">
-        <!-- Filter Tabs & Title -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-gray-200">
-            <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider">
+    {{-- ================================================================
+         5. DAFTAR TUGAS
+         ================================================================ --}}
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        {{-- Filter header --}}
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-bottom:16px;border-bottom:1px solid #e0e0e0;">
+            <h3 class="typography-tagline" style="color:#1d1d1f;margin:0;">
                 Daftar Tugas
             </h3>
 
-            <!-- Status Filters -->
-            <div class="flex items-center space-x-1 text-xs">
+            {{-- Filter chips --}}
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
                 <a href="{{ route('workspaces.show', $workspace) }}"
-                   class="px-2.5 py-1 rounded-md transition {{ empty($status) ? 'bg-blue-600 text-white font-semibold' : 'text-gray-600 hover:bg-gray-100' }}">
+                   class="apple-chip {{ empty($status) ? 'apple-chip-selected' : '' }}"
+                   style="font-size:13px;padding:6px 14px;">
                     Semua ({{ $totalTasks }})
                 </a>
                 <a href="{{ route('workspaces.show', [$workspace, 'status' => 'active']) }}"
-                   class="px-2.5 py-1 rounded-md transition {{ $status === 'active' ? 'bg-blue-600 text-white font-semibold' : 'text-gray-600 hover:bg-gray-100' }}">
+                   class="apple-chip {{ $status === 'active' ? 'apple-chip-selected' : '' }}"
+                   style="font-size:13px;padding:6px 14px;">
                     Belum Selesai ({{ $totalTasks - $completedTasks }})
                 </a>
                 <a href="{{ route('workspaces.show', [$workspace, 'status' => 'completed']) }}"
-                   class="px-2.5 py-1 rounded-md transition {{ $status === 'completed' ? 'bg-blue-600 text-white font-semibold' : 'text-gray-600 hover:bg-gray-100' }}">
+                   class="apple-chip {{ $status === 'completed' ? 'apple-chip-selected' : '' }}"
+                   style="font-size:13px;padding:6px 14px;">
                     Selesai ({{ $completedTasks }})
                 </a>
                 <a href="{{ route('workspaces.show', [$workspace, 'status' => 'penting']) }}"
-                   class="px-2.5 py-1 rounded-md transition {{ $status === 'penting' ? 'bg-blue-600 text-white font-semibold' : 'text-gray-600 hover:bg-gray-100' }}">
+                   class="apple-chip {{ $status === 'penting' ? 'apple-chip-selected' : '' }}"
+                   style="font-size:13px;padding:6px 14px;">
                     Penting ({{ $pentingTasks }})
                 </a>
             </div>
         </div>
 
+        {{-- Empty state --}}
         @if ($tasks->isEmpty())
-            <div class="bg-white rounded-xl border border-gray-200 p-8 text-center">
-                <div class="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+            <div class="apple-card" style="text-align:center;padding:64px 24px;">
+                <div style="width:48px;height:48px;border-radius:50%;background-color:#f5f5f7;border:1px solid #e0e0e0;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#7a7a7a;">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                     </svg>
                 </div>
-                <h4 class="text-sm font-semibold text-gray-800 mb-1">Belum Ada Tugas di Workspace Ini</h4>
-                <p class="text-xs text-gray-500">Tulis tugas pertama Anda pada form di atas!</p>
+                <h4 class="typography-body-strong" style="color:#1d1d1f;margin:0 0 4px;">
+                    Belum Ada Tugas di Workspace Ini
+                </h4>
+                <p class="typography-caption" style="color:#7a7a7a;margin:0;">
+                    Gunakan form di atas untuk menambahkan tugas baru.
+                </p>
             </div>
+
         @else
-            <div class="space-y-4">
+            <div style="display:flex;flex-direction:column;gap:12px;">
                 @foreach ($tasks as $task)
-                    <div class="p-4 rounded-xl border transition {{ $task->is_completed ? 'bg-gray-50 border-gray-200 opacity-75' : 'bg-white border-gray-200 hover:border-blue-300 shadow-xs' }}">
-                        <!-- Baris Utama Tugas: Checkbox, Judul, Info, & Aksi -->
-                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                            <!-- Sisi Kiri: Checkbox & Teks -->
-                            <div class="flex items-start space-x-3 flex-grow">
-                                <!-- Toggle Button Form -->
-                                <form action="{{ route('workspaces.tasks.toggle-status', [$workspace, $task]) }}" method="POST" class="shrink-0 mt-0.5">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" title="{{ $task->is_completed ? 'Tandai belum selesai' : 'Tandai selesai' }}" class="w-6 h-6 rounded-md border flex items-center justify-center cursor-pointer transition {{ $task->is_completed ? 'border-green-600 bg-green-600 text-white' : 'border-gray-300 hover:border-blue-500 bg-white' }}">
-                                        @if ($task->is_completed)
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                            </svg>
-                                        @endif
-                                    </button>
-                                </form>
+                    {{-- Task card --}}
+                    <div class="apple-card"
+                         style="padding:20px;{{ $task->is_completed ? 'background-color:#fafafc;opacity:0.85;' : 'background-color:#ffffff;' }}">
 
-                                <!-- Konten Tugas -->
-                                <div class="space-y-1">
-                                    <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-                                        <!-- Priority Badge -->
-                                        @if ($task->priority === 'penting')
-                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 uppercase tracking-wider">
-                                                [PENTING]
-                                            </span>
-                                        @else
-                                            <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-700 uppercase tracking-wider">
-                                                [MENYUSUL]
-                                            </span>
-                                        @endif
+                        {{-- Main row: toggle + info + actions --}}
+                        <div style="display:flex;align-items:flex-start;gap:16px;">
 
-                                        <!-- Title -->
-                                        <span class="text-sm font-semibold {{ $task->is_completed ? 'line-through text-gray-400' : 'text-gray-900' }} break-words">
-                                            {{ $task->title }}
+                            {{-- Status toggle circle --}}
+                            <form action="{{ route('workspaces.tasks.toggle-status', [$workspace, $task]) }}"
+                                  method="POST" style="margin:0;flex-shrink:0;padding-top:2px;">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit"
+                                        title="{{ $task->is_completed ? 'Tandai belum selesai' : 'Tandai selesai' }}"
+                                        style="width:24px;height:24px;border-radius:50%;border:{{ $task->is_completed ? '2px solid #0066cc' : '1.5px solid #e0e0e0' }};background-color:{{ $task->is_completed ? '#0066cc' : '#ffffff' }};color:{{ $task->is_completed ? '#ffffff' : 'transparent' }};display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.12s;flex-shrink:0;">
+                                    @if ($task->is_completed)
+                                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    @endif
+                                </button>
+                            </form>
+
+                            {{-- Task content --}}
+                            <div style="flex:1;min-width:0;">
+                                {{-- Priority + title --}}
+                                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px;">
+                                    @if ($task->priority === 'penting')
+                                        <span class="apple-chip"
+                                              style="font-size:11px;padding:2px 8px;font-weight:600;color:#ff3b30;border-color:rgba(255,59,48,0.3);">
+                                            [!] PENTING
                                         </span>
-                                    </div>
-
-                                    <!-- Description -->
-                                    @if ($task->description)
-                                        <p class="text-xs text-gray-600 break-words mt-1">
-                                            {!! nl2br(e($task->description)) !!}
-                                        </p>
+                                    @else
+                                        <span class="apple-chip"
+                                              style="font-size:11px;padding:2px 8px;font-weight:500;color:#7a7a7a;">
+                                            MENYUSUL
+                                        </span>
                                     @endif
 
-                                    <!-- Metadata info -->
-                                    <div class="flex items-center space-x-3 text-[11px] text-gray-500 flex-wrap gap-y-1 pt-1">
-                                        @if ($task->due_date)
-                                            <span class="{{ !$task->is_completed && $task->due_date->isPast() ? 'text-red-600 font-medium' : '' }}">
-                                                Tenggat: {{ $task->due_date->format('d M Y H:i') }}
-                                                @if (!$task->is_completed && $task->due_date->isPast())
-                                                    <span class="text-red-600 font-bold">(Terlewat)</span>
-                                                @endif
-                                            </span>
-                                            <span>&bull;</span>
-                                        @endif
+                                    <span class="typography-body-strong"
+                                          style="{{ $task->is_completed ? 'text-decoration:line-through;color:#7a7a7a;' : 'color:#1d1d1f;' }}word-break:break-word;">
+                                        {{ $task->title }}
+                                    </span>
+                                </div>
 
-                                        @if ($task->is_completed && $task->completed_at)
-                                            <span class="text-green-700">
-                                                Selesai pada: {{ $task->completed_at->format('d M Y H:i') }}
-                                            </span>
-                                            <span>&bull;</span>
-                                        @endif
+                                {{-- Description --}}
+                                @if ($task->description)
+                                    <p class="typography-caption" style="color:#7a7a7a;margin:0 0 8px;word-break:break-word;">
+                                        {!! nl2br(e($task->description)) !!}
+                                    </p>
+                                @endif
 
-                                        <span>Oleh: {{ $task->creator->name ?? 'Pengguna' }}</span>
-                                    </div>
+                                {{-- Metadata --}}
+                                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:#7a7a7a;">
+                                    @if ($task->due_date)
+                                        <span style="{{ !$task->is_completed && $task->due_date->isPast() ? 'color:#ff3b30;font-weight:600;' : '' }}">
+                                            Tenggat: {{ $task->due_date->format('d M Y H:i') }}
+                                            @if (!$task->is_completed && $task->due_date->isPast())
+                                                <span>(Terlewat)</span>
+                                            @endif
+                                        </span>
+                                        <span>&bull;</span>
+                                    @endif
+
+                                    @if ($task->is_completed && $task->completed_at)
+                                        <span style="color:#0066cc;">
+                                            Selesai: {{ $task->completed_at->format('d M Y H:i') }}
+                                        </span>
+                                        <span>&bull;</span>
+                                    @endif
+
+                                    <span>Oleh: {{ $task->creator->name ?? 'Pengguna' }}</span>
                                 </div>
                             </div>
 
-                            <!-- Sisi Kanan: Action Buttons -->
-                            <div class="flex items-center space-x-3 shrink-0 self-end sm:self-center text-xs">
-                                <a href="{{ route('workspaces.tasks.edit', [$workspace, $task]) }}" class="text-gray-600 hover:text-gray-900 font-medium transition">
+                            {{-- Actions: Edit + Hapus --}}
+                            <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;align-self:center;" class="typography-caption">
+                                <a href="{{ route('workspaces.tasks.edit', [$workspace, $task]) }}"
+                                   class="apple-text-link">
                                     Edit
                                 </a>
-                                <form action="{{ route('workspaces.tasks.destroy', [$workspace, $task]) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tugas ini?')">
+                                <form action="{{ route('workspaces.tasks.destroy', [$workspace, $task]) }}"
+                                      method="POST"
+                                      style="display:inline;margin:0;"
+                                      data-confirm="Apakah Anda yakin ingin menghapus tugas ini? Seluruh berkas lampirannya juga akan ikut terhapus permanen."
+                                      data-confirm-title="Hapus Tugas"
+                                      data-confirm-btn="Hapus Tugas">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800 font-medium transition cursor-pointer">
+                                    <button type="submit"
+                                            style="color:#ff3b30;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-size:14px;font-weight:400;">
                                         Hapus
                                     </button>
                                 </form>
                             </div>
                         </div>
 
-                        <!-- Lampiran / Berkas Tugas (PRD 4) -->
-                        <div class="mt-3 pt-3 border-t border-gray-100">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                        {{-- ============================================
+                             ATTACHMENTS SECTION
+                             ============================================ --}}
+                        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                                <span class="typography-caption-strong" style="color:#1d1d1f;display:flex;align-items:center;gap:6px;">
+                                    <svg width="14" height="14" fill="none" stroke="#7a7a7a" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                                     </svg>
-                                    Berkas Lampiran Tugas
-                                    <span class="text-[11px] font-normal text-gray-400">({{ $task->attachments->count() }})</span>
+                                    Berkas Lampiran
+                                    <span style="color:#7a7a7a;font-weight:400;">({{ $task->attachments->count() }})</span>
                                 </span>
                             </div>
 
-                            <!-- List Berkas yang Sudah Diunggah -->
                             @if ($task->attachments->isNotEmpty())
-                                <div class="space-y-1.5 mb-3">
+                                <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
                                     @foreach ($task->attachments as $attachment)
-                                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2 rounded-lg bg-gray-50 border border-gray-200 text-xs gap-2">
-                                            <div class="flex items-center space-x-2 truncate">
-                                                @php
-                                                    $ext = strtoupper(pathinfo($attachment->original_name, PATHINFO_EXTENSION));
-                                                    $badgeClass = match($ext) {
-                                                        'PDF' => 'bg-red-100 text-red-700 border-red-200',
-                                                        'ZIP' => 'bg-purple-100 text-purple-700 border-purple-200',
-                                                        'DOC', 'DOCX' => 'bg-blue-100 text-blue-700 border-blue-200',
-                                                        'JPG', 'JPEG', 'PNG' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
-                                                        default => 'bg-gray-100 text-gray-700 border-gray-200',
-                                                    };
-                                                @endphp
-                                                <span class="px-1.5 py-0.5 text-[10px] font-bold rounded border {{ $badgeClass }}">
+                                        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:12px;background-color:#fafafc;border:1px solid #e0e0e0;gap:12px;flex-wrap:wrap;"
+                                             class="typography-caption">
+                                            <div style="display:flex;align-items:center;gap:8px;overflow:hidden;flex:1;min-width:0;">
+                                                @php $ext = strtoupper(pathinfo($attachment->original_name, PATHINFO_EXTENSION)); @endphp
+                                                <span class="apple-chip" style="font-size:10px;padding:2px 6px;font-weight:700;flex-shrink:0;">
                                                     {{ $ext }}
                                                 </span>
-                                                
-                                                <div class="truncate">
-                                                    <a href="{{ route('workspaces.tasks.attachments.download', [$workspace->id, $task->id, $attachment->id]) }}" 
-                                                       class="font-medium text-gray-800 hover:text-blue-600 truncate block">
+                                                <div style="overflow:hidden;min-width:0;">
+                                                    <a href="{{ route('workspaces.tasks.attachments.download', [$workspace->id, $task->id, $attachment->id]) }}"
+                                                       class="apple-text-link"
+                                                       style="font-weight:500;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                                                         {{ $attachment->original_name }}
                                                     </a>
-                                                    <div class="text-[10px] text-gray-400">
-                                                        {{ $attachment->formatted_size }} &bull; Diunggah oleh: {{ $attachment->uploader->name ?? 'Pengguna' }} &bull; {{ $attachment->created_at->format('d M Y H:i') }}
+                                                    <div style="font-size:11px;color:#7a7a7a;white-space:nowrap;">
+                                                        {{ $attachment->formatted_size }} &bull; {{ $attachment->uploader->name ?? 'Pengguna' }} &bull; {{ $attachment->created_at->format('d M Y H:i') }}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                                                <a href="{{ route('workspaces.tasks.attachments.download', [$workspace->id, $task->id, $attachment->id]) }}" 
-                                                   class="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                                    </svg>
+                                            <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+                                                <a href="{{ route('workspaces.tasks.attachments.download', [$workspace->id, $task->id, $attachment->id]) }}"
+                                                   class="apple-text-link" style="font-weight:500;">
                                                     Unduh
                                                 </a>
-
                                                 @if ($attachment->user_id === auth()->id() || $workspace->user_id === auth()->id())
-                                                    <form action="{{ route('workspaces.tasks.attachments.destroy', [$workspace->id, $task->id, $attachment->id]) }}" 
-                                                          method="POST" 
-                                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus berkas lampiran ini?')">
+                                                    <form action="{{ route('workspaces.tasks.attachments.destroy', [$workspace->id, $task->id, $attachment->id]) }}"
+                                                          method="POST"
+                                                          style="display:inline;margin:0;"
+                                                          data-confirm="Apakah Anda yakin ingin menghapus berkas lampiran ini?"
+                                                          data-confirm-title="Hapus Berkas Lampiran"
+                                                          data-confirm-btn="Hapus Berkas">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="text-red-500 hover:text-red-700 font-medium flex items-center gap-1 cursor-pointer">
-                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                            </svg>
+                                                        <button type="submit"
+                                                                style="color:#ff3b30;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-size:14px;font-weight:400;">
                                                             Hapus
                                                         </button>
                                                     </form>
@@ -436,35 +489,36 @@
                                     @endforeach
                                 </div>
                             @else
-                                <p class="text-xs text-gray-400 italic py-1">Belum ada berkas yang diunggah untuk tugas ini.</p>
+                                <p class="typography-caption" style="color:#7a7a7a;font-style:italic;margin:0 0 12px;">
+                                    Belum ada berkas lampiran untuk tugas ini.
+                                </p>
                             @endif
 
-                            <!-- Form Upload Berkas Baru -->
-                            <div class="mt-2 p-3 bg-blue-50/50 rounded-lg border border-dashed border-blue-200">
-                                <form action="{{ route('workspaces.tasks.attachments.store', [$workspace->id, $task->id]) }}" 
-                                      method="POST" 
+                            {{-- Upload form --}}
+                            <div style="padding:16px;background-color:#fafafc;border-radius:12px;border:1px solid #e0e0e0;">
+                                <form action="{{ route('workspaces.tasks.attachments.store', [$workspace->id, $task->id]) }}"
+                                      method="POST"
                                       enctype="multipart/form-data">
                                     @csrf
-                                    <label for="attachment-{{ $task->id }}" class="block text-[11px] font-semibold text-gray-700 mb-1">
-                                        Pilih Berkas Lampiran (Maksimal 10 MB — PDF, DOC, DOCX, ZIP, PNG, JPG)
+                                    <label for="attachment-{{ $task->id }}"
+                                           class="typography-caption-strong"
+                                           style="display:block;color:#1d1d1f;margin-bottom:8px;">
+                                        Pilih Berkas Lampiran
+                                        <span style="color:#7a7a7a;font-weight:400;">(Maks. 10 MB — PDF, DOC, DOCX, ZIP, PNG, JPG)</span>
                                     </label>
-                                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                                        <input type="file" 
-                                               id="attachment-{{ $task->id }}" 
-                                               name="attachment" 
-                                               required 
+                                    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+                                        <input type="file"
+                                               id="attachment-{{ $task->id }}"
+                                               name="attachment"
+                                               required
                                                accept=".pdf,.doc,.docx,.zip,.jpg,.jpeg,.png"
-                                               class="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
-                                        
-                                        <button type="submit" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-1.5 px-3 rounded transition flex items-center gap-1 cursor-pointer">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                            </svg>
+                                               style="flex:1;min-width:0;font-size:13px;color:#7a7a7a;cursor:pointer;">
+                                        <button type="submit" class="apple-btn-primary-compact" style="flex-shrink:0;">
                                             Unggah
                                         </button>
                                     </div>
                                     @error('attachment')
-                                        <p class="text-xs text-red-600 mt-1 font-medium">{{ $message }}</p>
+                                        <p class="typography-caption" style="color:#ff3b30;margin:4px 0 0;">{{ $message }}</p>
                                     @enderror
                                 </form>
                             </div>
@@ -474,5 +528,6 @@
             </div>
         @endif
     </div>
+
 </div>
 @endsection
