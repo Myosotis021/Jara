@@ -20,46 +20,105 @@
 <body style="background-color:#f5f5f7;color:#1d1d1f;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;">
 
     <!-- ===================================================================
-         TOP NAV ROW 1: global-nav (44px, surface-black, nav-link 12px)
+         APPLE RESIZABLE NAVBAR (Native Vanilla JS + CSS Architecture)
+         Transforms from full-width header to floating glass pill on scroll
          =================================================================== -->
-    <header class="apple-global-nav w-full">
-        <div style="max-width:1440px;margin:0 auto;height:44px;padding:0 32px;display:flex;align-items:center;justify-content:space-between;">
-            <!-- Brand + Primary Nav links -->
-            <div style="display:flex;align-items:center;gap:32px;">
-                <a href="{{ route('workspaces.index') }}"
-                   style="font-size:13px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:-0.1px;line-height:1;">
-                    JARA
+    <header id="apple-resizable-navbar" class="apple-resizable-nav-wrapper">
+        <div class="apple-resizable-nav-container">
+            <!-- Brand Logo -->
+            <div class="apple-nav-brand">
+                <a href="{{ route('workspaces.index') }}" class="apple-nav-brand-link">
+                    <span class="apple-nav-brand-badge">J</span>
+                    <span class="apple-nav-brand-text">JARA</span>
                 </a>
-                @auth
-                    <nav style="display:flex;align-items:center;gap:24px;" class="hidden sm:flex">
-                        <a href="{{ route('workspaces.index') }}"
-                           style="font-size:12px;font-weight:400;letter-spacing:-0.12px;text-decoration:none;color:{{ request()->is('workspaces*') ? '#ffffff' : '#cccccc' }};transition:color 0.12s;">
-                            Workspaces
-                        </a>
-                        @if(auth()->user()->isAdmin())
-                            <a href="{{ route('admin.users.index') }}"
-                               style="font-size:12px;font-weight:400;letter-spacing:-0.12px;text-decoration:none;color:{{ request()->routeIs('admin.users.*') ? '#ffffff' : '#cccccc' }};transition:color 0.12s;">
-                                Kelola Pengguna
-                            </a>
-                        @endif
-                    </nav>
-                @endauth
             </div>
 
-            <!-- Right: User info + utility actions -->
-            <div style="display:flex;align-items:center;gap:16px;">
+            <!-- Desktop Navigation Links with Animated Hover Pill -->
+            <nav class="apple-nav-links-desktop">
+                <a href="{{ route('workspaces.index') }}"
+                   class="apple-nav-link-item {{ request()->is('workspaces*') ? 'is-active' : '' }}">
+                    <span>Workspaces</span>
+                </a>
                 @auth
-                    <span style="font-size:12px;color:#cccccc;letter-spacing:-0.12px;" class="hidden sm:inline">
-                        {{ auth()->user()->name }}
-                    </span>
+                    @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.users.index') }}"
+                           class="apple-nav-link-item {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}">
+                            <span>Kelola Pengguna</span>
+                        </a>
+                    @endif
+                @endauth
+            </nav>
+
+            <!-- Right Actions: User Profile / Auth CTA -->
+            <div class="apple-nav-actions-desktop">
+                @auth
+                    <div class="apple-nav-user-pill">
+                        <span class="apple-nav-user-avatar">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </span>
+                        <span class="apple-nav-user-name">
+                            {{ auth()->user()->name }}
+                        </span>
+                    </div>
                     <form action="{{ route('logout') }}" method="POST" style="display:inline;margin:0;">
                         @csrf
-                        <button type="submit" class="apple-btn-dark">
+                        <button type="submit" class="apple-nav-btn-secondary">
                             Keluar
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="apple-text-link-on-dark" style="font-size:12px;">
+                    <a href="{{ route('login') }}" class="apple-nav-btn-primary">
+                        Masuk
+                    </a>
+                @endauth
+            </div>
+
+            <!-- Mobile Hamburger Toggle -->
+            <button type="button" id="apple-mobile-menu-toggle" class="apple-mobile-toggle-btn" aria-label="Menu" aria-expanded="false">
+                <svg class="icon-menu-hamburger" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                <svg class="icon-menu-close" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Nav Menu Sheet -->
+        <div id="apple-mobile-nav-sheet" class="apple-mobile-nav-sheet">
+            <div class="apple-mobile-nav-links">
+                <a href="{{ route('workspaces.index') }}"
+                   class="apple-mobile-link {{ request()->is('workspaces*') ? 'is-active' : '' }}">
+                    Workspaces
+                </a>
+                @auth
+                    @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.users.index') }}"
+                           class="apple-mobile-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}">
+                            Kelola Pengguna
+                        </a>
+                    @endif
+                @endauth
+            </div>
+
+            <div class="apple-mobile-nav-footer">
+                @auth
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:8px 12px;background:rgba(0,0,0,0.03);border-radius:10px;">
+                        <span class="apple-nav-user-avatar">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </span>
+                        <div style="font-size:13px;font-weight:500;color:#1d1d1f;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            {{ auth()->user()->name }}
+                        </div>
+                    </div>
+                    <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+                        @csrf
+                        <button type="submit" class="apple-nav-btn-secondary" style="width:100%;justify-content:center;">
+                            Keluar
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="apple-nav-btn-primary" style="width:100%;display:flex;justify-content:center;">
                         Masuk
                     </a>
                 @endauth

@@ -8,8 +8,15 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     initAppleDialog();
+    initTaskCreateModal();
+    initTaskEditModal();
     initAppleDateTimePickers();
     initAppleCustomSelects();
+    initAppleResizableNavbar();
+});
+
+document.addEventListener('turbo:load', () => {
+    initAppleResizableNavbar();
 });
 
 /* ==========================================================================
@@ -117,6 +124,150 @@ function initAppleDialog() {
 }
 
 /* ==========================================================================
+   1b. Task Create Modal Popup Window
+   ========================================================================== */
+function initTaskCreateModal() {
+    const modal = document.getElementById('task-create-modal');
+    if (!modal) return;
+
+    function openModal() {
+        modal.classList.add('is-open');
+        const firstInput = modal.querySelector('#title');
+        if (firstInput) setTimeout(() => firstInput.focus(), 100);
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        const stage = modal.querySelector('#task-modal-stage');
+        if (stage) stage.classList.remove('has-calendar-open');
+        const sidePopup = modal.querySelector('.apple-datetime-popup');
+        if (sidePopup) sidePopup.classList.remove('is-open');
+        const trigger = modal.querySelector('.apple-datetime-trigger');
+        if (trigger) trigger.classList.remove('is-active');
+    }
+
+    document.querySelectorAll('.open-task-modal-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
+        });
+    });
+
+    document.querySelectorAll('.close-task-modal-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal();
+        });
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal || e.target.id === 'task-modal-stage') closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+            const stage = modal.querySelector('#task-modal-stage');
+            if (stage && stage.classList.contains('has-calendar-open')) {
+                const closeBtn = stage.querySelector('.apple-cal-close');
+                if (closeBtn) closeBtn.click();
+                else stage.classList.remove('has-calendar-open');
+            } else {
+                closeModal();
+            }
+        }
+    });
+
+    // Expose globally
+    window.TaskCreateModal = { open: openModal, close: closeModal };
+}
+
+/* ==========================================================================
+   1c. Task Edit Modal Popup Window
+   ========================================================================== */
+function initTaskEditModal() {
+    const modal = document.getElementById('task-edit-modal');
+    if (!modal) return;
+
+    const form = document.getElementById('task-edit-modal-form');
+    const taskIdInput = document.getElementById('edit_task_id');
+    const titleInput = document.getElementById('edit_title');
+    const descInput = document.getElementById('edit_description');
+    const prioritySelect = document.getElementById('edit_priority');
+    const dueDateInput = document.getElementById('edit_due_date');
+    const stage = modal.querySelector('#task-edit-modal-stage');
+
+    function openModal(data) {
+        if (data.action && form) form.action = data.action;
+        if (taskIdInput && data.id) taskIdInput.value = data.id;
+        if (titleInput) titleInput.value = data.title || '';
+        if (descInput) descInput.value = data.description || '';
+        if (prioritySelect) {
+            prioritySelect.value = data.priority || 'menyusul';
+            prioritySelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        if (dueDateInput) {
+            dueDateInput.value = data.dueDate || '';
+            dueDateInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        modal.classList.add('is-open');
+        if (titleInput) setTimeout(() => titleInput.focus(), 100);
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        if (stage) stage.classList.remove('has-calendar-open');
+        const sidePopup = modal.querySelector('.apple-datetime-popup');
+        if (sidePopup) sidePopup.classList.remove('is-open');
+        const trigger = modal.querySelector('.apple-datetime-trigger');
+        if (trigger) trigger.classList.remove('is-active');
+    }
+
+    document.querySelectorAll('.open-task-edit-modal-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // Only intercept primary left clicks without modifier keys so standard opening in new tabs works
+            if (e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
+                e.preventDefault();
+                openModal({
+                    id: btn.dataset.taskId,
+                    title: btn.dataset.taskTitle,
+                    description: btn.dataset.taskDescription,
+                    priority: btn.dataset.taskPriority,
+                    dueDate: btn.dataset.taskDueDate,
+                    action: btn.dataset.taskAction,
+                });
+            }
+        });
+    });
+
+    document.querySelectorAll('.close-task-edit-modal-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal();
+        });
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal || e.target.id === 'task-edit-modal-stage') closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+            if (stage && stage.classList.contains('has-calendar-open')) {
+                const closeBtn = stage.querySelector('.apple-cal-close');
+                if (closeBtn) closeBtn.click();
+                else stage.classList.remove('has-calendar-open');
+            } else {
+                closeModal();
+            }
+        }
+    });
+
+    // Expose globally
+    window.TaskEditModal = { open: openModal, close: closeModal };
+}
+
+/* ==========================================================================
    2. Apple Custom Date & Time Picker Popup Window
    ========================================================================== */
 function initAppleDateTimePickers() {
@@ -178,6 +329,14 @@ function initAppleDateTimePickers() {
         popup.setAttribute('role', 'dialog');
         popup.setAttribute('aria-label', 'Pilih Tanggal dan Waktu');
         popup.innerHTML = `
+            <!-- Calendar Side Header -->
+            <div class="apple-cal-side-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f0f0f0;">
+                <span class="apple-chip" style="font-size:11px;padding:3px 10px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">
+                    Atur Tenggat Waktu
+                </span>
+                <button type="button" class="apple-cal-close" style="background:none;border:none;color:#7a7a7a;font-size:18px;cursor:pointer;padding:2px 6px;line-height:1;border-radius:50%;transition:background-color 0.12s;" title="Tutup">✕</button>
+            </div>
+
             <!-- Calendar Header -->
             <div class="apple-cal-header">
                 <button type="button" class="apple-cal-nav-btn apple-cal-prev" aria-label="Bulan sebelumnya">
@@ -248,7 +407,18 @@ function initAppleDateTimePickers() {
                 <button type="button" class="apple-cal-apply apple-btn-primary-compact"   style="font-size:13px;padding:6px 16px;">Terapkan</button>
             </div>
         `;
-        wrapper.appendChild(popup);
+
+        // Check if this input is inside a modal or page stage with a side companion panel
+        const modalHost  = input.closest('#task-create-modal, #task-edit-modal, .apple-modal-page-backdrop');
+        const modalStage = modalHost ? modalHost.querySelector('.apple-modal-stage') : null;
+        const sidePanel  = modalHost ? modalHost.querySelector('.apple-modal-calendar-panel') : null;
+
+        if (sidePanel) {
+            popup.classList.add('apple-datetime-popup-side');
+            sidePanel.appendChild(popup);
+        } else {
+            wrapper.appendChild(popup);
+        }
 
         // ------------------------------------------------------------------
         // DOM references within popup
@@ -389,7 +559,23 @@ function initAppleDateTimePickers() {
             'Juli','Agustus','September','Oktober','November','Desember'
         ];
 
-        let selectedDate = input.value ? new Date(input.value) : null;
+        function parseDateTimeString(val) {
+            if (!val) return null;
+            const match = String(val).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+            if (match) {
+                return new Date(
+                    parseInt(match[1], 10),
+                    parseInt(match[2], 10) - 1,
+                    parseInt(match[3], 10),
+                    parseInt(match[4], 10),
+                    parseInt(match[5], 10)
+                );
+            }
+            const d = new Date(val);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        let selectedDate = parseDateTimeString(input.value);
         let viewDate     = selectedDate ? new Date(selectedDate) : new Date();
 
         // ------------------------------------------------------------------
@@ -491,6 +677,11 @@ function initAppleDateTimePickers() {
             // Close any other open pickers
             document.querySelectorAll('.apple-datetime-popup.is-open').forEach(p  => p.classList.remove('is-open'));
             document.querySelectorAll('.apple-datetime-trigger.is-active').forEach(t => t.classList.remove('is-active'));
+            document.querySelectorAll('.apple-modal-stage.has-calendar-open').forEach(s => s.classList.remove('has-calendar-open'));
+
+            if (modalStage && sidePanel) {
+                modalStage.classList.add('has-calendar-open');
+            }
             popup.classList.add('is-open');
             trigger.classList.add('is-active');
             trigger.setAttribute('aria-expanded', 'true');
@@ -499,6 +690,9 @@ function initAppleDateTimePickers() {
 
         function closePopup() {
             closeTimeMenus();
+            if (modalStage && sidePanel) {
+                modalStage.classList.remove('has-calendar-open');
+            }
             popup.classList.remove('is-open');
             trigger.classList.remove('is-active');
             trigger.setAttribute('aria-expanded', 'false');
@@ -562,12 +756,44 @@ function initAppleDateTimePickers() {
             closePopup();
         });
 
-        closeBtn.addEventListener('click', closePopup);
+        popup.querySelectorAll('.apple-cal-close').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closePopup();
+            });
+        });
 
         // Outside click closes popup
         document.addEventListener('click', (e) => {
             if (!document.body.contains(e.target)) return;
-            if (!wrapper.contains(e.target)) closePopup();
+            if (!wrapper.contains(e.target) && !popup.contains(e.target)) {
+                closePopup();
+            }
+        });
+
+        // Escape key closes open picker
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && popup.classList.contains('is-open')) {
+                closePopup();
+            }
+        });
+
+        // Sync when value is programmatically changed on the input
+        input.addEventListener('change', () => {
+            selectedDate = parseDateTimeString(input.value);
+            viewDate     = selectedDate ? new Date(selectedDate) : new Date();
+            if (selectedDate) {
+                currentHour = String(selectedDate.getHours()).padStart(2, '0');
+                const nearestMin = Math.round(selectedDate.getMinutes() / 5) * 5;
+                currentMinute = String(nearestMin === 60 ? 55 : nearestMin).padStart(2, '0');
+            } else {
+                currentHour = '00';
+                currentMinute = '00';
+            }
+            hourDisplay.textContent = currentHour;
+            minDisplay.textContent = currentMinute;
+            renderTimeDropdowns();
+            updateDisplay();
         });
 
         // Initial render
@@ -691,4 +917,76 @@ function initAppleCustomSelects() {
         select.addEventListener('change', updateTrigger);
         updateTrigger();
     });
+}
+
+/* ==========================================================================
+   5. Apple Resizable Navbar (Scroll Detection & Mobile Sheet)
+   ========================================================================== */
+function initAppleResizableNavbar() {
+    const navbar = document.getElementById('apple-resizable-navbar');
+    const toggleBtn = document.getElementById('apple-mobile-menu-toggle');
+    const sheet = document.getElementById('apple-mobile-nav-sheet');
+
+    if (!navbar) return;
+
+    // Scroll listener for expanding / contracting into floating pill
+    let ticking = false;
+    const onScroll = () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                if (window.scrollY > 40) {
+                    navbar.classList.add('is-scrolled');
+                } else {
+                    navbar.classList.remove('is-scrolled');
+                }
+                ticking = false;
+            });
+            ticking = true;
+        }
+    };
+
+    window.removeEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Mobile Hamburger Toggle
+    if (toggleBtn && sheet) {
+        const iconMenu = toggleBtn.querySelector('.icon-menu-hamburger');
+        const iconClose = toggleBtn.querySelector('.icon-menu-close');
+
+        const openMenu = () => {
+            sheet.classList.add('is-open');
+            toggleBtn.setAttribute('aria-expanded', 'true');
+            if (iconMenu) iconMenu.style.display = 'none';
+            if (iconClose) iconClose.style.display = 'block';
+        };
+
+        const closeMenu = () => {
+            sheet.classList.remove('is-open');
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            if (iconMenu) iconMenu.style.display = 'block';
+            if (iconClose) iconClose.style.display = 'none';
+        };
+
+        // Remove old listeners to avoid stacking
+        const newToggleBtn = toggleBtn.cloneNode(true);
+        toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+
+        newToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sheet.classList.contains('is-open') ? closeMenu() : openMenu();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!navbar.contains(e.target)) {
+                closeMenu();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMenu();
+            }
+        });
+    }
 }
