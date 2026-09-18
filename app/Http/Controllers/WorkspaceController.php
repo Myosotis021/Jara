@@ -6,7 +6,9 @@ use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class WorkspaceController extends Controller
@@ -146,8 +148,28 @@ class WorkspaceController extends Controller
             abort(403, 'Hanya pemilik yang dapat mengubah atau menghapus workspace ini.');
         }
 
-        $workspace->delete();
+        // Kumpulkan path file dari lampiran tugas workspace ini
+        $filePaths = $workspace->tasks()
+            ->with('attachments')
+            ->get()
+            ->flatMap(fn ($task) => $task->attachments->pluck('file_path'))
+            ->filter()
+            ->toArray();
 
-        return redirect()->route('workspaces.index')->with('success', 'Workspace berhasil dihapus.');
+        try {
+            DB::transaction(function () use ($workspace) {
+                $workspace->delete();
+            });
+        } catch (\Throwable $e) {
+            return redirect()->route('workspaces.index')
+                ->with('error', 'Gagal menghapus workspace. Silakan coba lagi.');
+        }
+
+        if (!empty($filePaths)) {
+            Storage::disk('public')->delete($filePaths);
+        }
+
+        return redirect()->route('workspaces.index')
+            ->with('success', 'Workspace berhasil dihapus.');
     }
 }

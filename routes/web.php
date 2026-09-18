@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Route;
 | Redirect Root
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn () => redirect('/login'));
+Route::get('/', function () {
+    return auth()->check() ? redirect('/workspaces') : redirect('/login');
+});
 
 /*
 |--------------------------------------------------------------------------
