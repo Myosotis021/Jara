@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Task;
+use App\Models\TaskAttachment;
 use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class TaskTest extends TestCase
@@ -269,5 +272,102 @@ class TaskTest extends TestCase
         $response = $this->actingAs($owner)->get("/workspaces/{$workspace->id}?status=completed");
         $response->assertSee('Tugas Sudah Selesai');
         $response->assertDontSee('Tugas Masih Aktif');
+    }
+
+    public function test_task_deletion_removes_physical_attachment_files(): void
+    {
+        Storage::fake('public');
+
+        $owner = User::factory()->create();
+        $workspace = Workspace::create([
+            'user_id' => $owner->id,
+            'name' => 'Projek Hapus File',
+        ]);
+
+        $task = $workspace->tasks()->create([
+            'user_id' => $owner->id,
+            'title' => 'Tugas dengan Lampiran',
+            'priority' => 'penting',
+        ]);
+
+        $file1 = UploadedFile::fake()->create('dokumen1.pdf', 100, 'application/pdf');
+        $path1 = $file1->store('task-attachments', 'public');
+
+        $file2 = UploadedFile::fake()->create('dokumen2.png', 200, 'image/png');
+        $path2 = $file2->store('task-attachments', 'public');
+
+        $task->attachments()->create([
+            'user_id' => $owner->id,
+            'original_name' => 'dokumen1.pdf',
+            'file_path' => $path1,
+            'file_size' => 100 * 1024,
+            'mime_type' => 'application/pdf',
+        ]);
+
+        $task->attachments()->create([
+            'user_id' => $owner->id,
+            'original_name' => 'dokumen2.png',
+            'file_path' => $path2,
+            'file_size' => 200 * 1024,
+            'mime_type' => 'image/png',
+        ]);
+
+        Storage::disk('public')->assertExists($path1);
+        Storage::disk('public')->assertExists($path2);
+
+        $response = $this->actingAs($owner)->delete("/workspaces/{$workspace->id}/tasks/{$task->id}");
+
+        $response->assertRedirect("/workspaces/{$workspace->id}");
+        $response->assertSessionHas('success', 'Tugas berhasil dihapus.');
+
+        $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
+        $this->assertDatabaseMissing('task_attachments', ['file_path' => $path1]);
+        $this->assertDatabaseMissing('task_attachments', ['file_path' => $path2]);
+
+        Storage::disk('public')->assertMissing($path1);
+        Storage::disk('public')->assertMissing($path2);
+    }
+
+    public function test_task_deletion_rolls_back_and_preserves_files_when_database_fails(): void
+    {
+        Storage::fake('public');
+
+        $owner = User::factory()->create();
+        $workspace = Workspace::create([
+            'user_id' => $owner->id,
+            'name' => 'Projek Rollback',
+        ]);
+
+        $task = $workspace->tasks()->create([
+            'user_id' => $owner->id,
+            'title' => 'Tugas yang Gagal Dihapus',
+            'priority' => 'penting',
+        ]);
+
+        $file = UploadedFile::fake()->create('dokumen.pdf', 100, 'application/pdf');
+        $path = $file->store('task-attachments', 'public');
+
+        $attachment = $task->attachments()->create([
+            'user_id' => $owner->id,
+            'original_name' => 'dokumen.pdf',
+            'file_path' => $path,
+            'file_size' => 100 * 1024,
+            'mime_type' => 'application/pdf',
+        ]);
+
+        // Simulasikan kegagalan transaksi database dengan model event
+        Task::deleting(function () {
+            throw new \Exception('Database query failure during deletion');
+        });
+
+        $response = $this->actingAs($owner)->delete("/workspaces/{$workspace->id}/tasks/{$task->id}");
+
+        $response->assertRedirect("/workspaces/{$workspace->id}");
+        $response->assertSessionHas('error', 'Gagal menghapus tugas. Silakan coba lagi.');
+
+        // Data di database dan file di disk harus tetap ada
+        $this->assertDatabaseHas('tasks', ['id' => $task->id]);
+        $this->assertDatabaseHas('task_attachments', ['id' => $attachment->id]);
+        Storage::disk('public')->assertExists($path);
     }
 }
