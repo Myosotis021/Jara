@@ -189,3 +189,5 @@ const DummyContent = () => {
     </div>
   );
 };
+
+export { Default, Sizes, Types, Shapes, PrefixSuffix, Rounded, Loading, Disabled } from "@/components/ui/button-demo";

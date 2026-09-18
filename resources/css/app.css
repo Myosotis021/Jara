@@ -529,164 +529,349 @@ body {
 }
 
 /* ========================================================================
-   Buttons
+/* ========================================================================
+   Buttons — Converted Design System
+   Compatible with Native Architecture (Laravel Blade + Tailwind CSS)
    ======================================================================== */
 
-/* button-primary: Action Blue Pill (primary CTA) */
-.apple-btn-primary {
+/* Base button styles */
+.apple-btn-primary,
+.apple-btn-primary-compact,
+.apple-btn-secondary,
+.apple-btn-secondary-compact,
+.apple-btn-danger,
+.apple-btn-warning,
+.apple-btn-tertiary,
+.apple-btn-dark,
+.apple-btn-pearl,
+.btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    background-color: #0066cc;
-    color: #ffffff !important;
+    gap: 6px;
     font-family: var(--font-sans);
-    font-size: 17px;
-    font-weight: 400;
-    line-height: 1.47;
-    letter-spacing: -0.374px;
-    border-radius: 9999px;
-    padding: 11px 22px;
-    border: none;
-    cursor: pointer;
+    font-weight: 500;
     text-decoration: none;
-    transition: transform 0.12s ease, background-color 0.12s ease;
-    box-shadow: none !important;
+    cursor: pointer;
     white-space: nowrap;
+    user-select: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
 }
 
-.apple-btn-primary:active {
-    transform: scale(0.95);
+/* Active feedback */
+.apple-btn-primary:active,
+.apple-btn-primary-compact:active,
+.apple-btn-secondary:active,
+.apple-btn-secondary-compact:active,
+.apple-btn-danger:active,
+.apple-btn-warning:active,
+.apple-btn-tertiary:active,
+.apple-btn-dark:active,
+.apple-btn-pearl:active,
+.btn:active {
+    transform: scale(0.97);
 }
 
-.apple-btn-primary:focus-visible {
-    outline: 2px solid #0071e3;
-    outline-offset: 2px;
+/* Universal Focus Ring: focus:shadow-[0_0_0_2px_hsla(0,0%,100%,1),0_0_0_4px_oklch(57.61% 0.2508 258.23)] */
+.apple-btn-primary:focus-visible,
+.apple-btn-primary-compact:focus-visible,
+.apple-btn-secondary:focus-visible,
+.apple-btn-secondary-compact:focus-visible,
+.apple-btn-danger:focus-visible,
+.apple-btn-warning:focus-visible,
+.apple-btn-tertiary:focus-visible,
+.apple-btn-dark:focus-visible,
+.apple-btn-pearl:focus-visible,
+.btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px oklch(57.61% 0.2508 258.23) !important;
 }
 
-/* button-primary compact: smaller variant for sub-nav / inline CTAs */
-.apple-btn-primary-compact {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    background-color: #0066cc;
+/* Type: Primary (bg-[#171717] dark:bg-[#ededed] hover:bg-[#383838] dark:hover:bg-[#cccccc] text-white dark:text-[#0a0a0a]) */
+.apple-btn-primary,
+.btn-primary {
+    background-color: #171717;
     color: #ffffff !important;
-    font-family: var(--font-sans);
+    fill: #ffffff;
+    border: none;
+    border-radius: 100px;
+    height: 40px;
+    padding: 0 18px;
     font-size: 14px;
-    font-weight: 400;
-    line-height: 1.29;
-    letter-spacing: -0.224px;
-    border-radius: 9999px;
-    padding: 8px 16px;
+    line-height: 1.4;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 2px rgba(0, 0, 0, 0.04);
+}
+
+.apple-btn-primary:hover,
+.btn-primary:hover {
+    background-color: #383838;
+}
+
+.dark .apple-btn-primary,
+.dark .btn-primary {
+    background-color: #ededed;
+    color: #0a0a0a !important;
+    fill: #0a0a0a;
+}
+
+.dark .apple-btn-primary:hover,
+.dark .btn-primary:hover {
+    background-color: #cccccc;
+}
+
+/* Type: Primary Compact (Small: px-1.5 h-8 text-sm) */
+.apple-btn-primary-compact,
+.btn-primary.btn-small {
+    background-color: #171717;
+    color: #ffffff !important;
+    fill: #ffffff;
     border: none;
-    cursor: pointer;
-    text-decoration: none;
-    transition: transform 0.12s ease;
-    box-shadow: none !important;
-    white-space: nowrap;
+    border-radius: 100px;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 13px;
+    line-height: 1.3;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 2px rgba(0, 0, 0, 0.04);
 }
 
-.apple-btn-primary-compact:active {
-    transform: scale(0.95);
+.apple-btn-primary-compact:hover,
+.btn-primary.btn-small:hover {
+    background-color: #383838;
 }
 
-.apple-btn-primary-compact:focus-visible {
-    outline: 2px solid #0071e3;
-    outline-offset: 2px;
+.dark .apple-btn-primary-compact,
+.dark .btn-primary.btn-small {
+    background-color: #ededed;
+    color: #0a0a0a !important;
+    fill: #0a0a0a;
 }
 
-/* button-secondary-pill: ghost pill (secondary CTA) */
-.apple-btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+.dark .apple-btn-primary-compact:hover,
+.dark .btn-primary.btn-small:hover {
+    background-color: #cccccc;
+}
+
+/* Type: Secondary (bg-white dark:bg-[#171717] hover:bg-[#00000014] text-[#171717] border border-[#00000014]) */
+.apple-btn-secondary,
+.btn-secondary {
+    background-color: #ffffff;
+    color: #171717 !important;
+    fill: #171717;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 100px;
+    height: 40px;
+    padding: 0 18px;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.apple-btn-secondary:hover,
+.btn-secondary:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+.dark .apple-btn-secondary,
+.dark .btn-secondary {
+    background-color: #171717;
+    color: #ededed !important;
+    fill: #ededed;
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.dark .apple-btn-secondary:hover,
+.dark .btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+/* Type: Secondary Compact (Small: px-1.5 h-8 text-sm) */
+.apple-btn-secondary-compact,
+.btn-secondary.btn-small {
+    background-color: #ffffff;
+    color: #171717 !important;
+    fill: #171717;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 100px;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 13px;
+    line-height: 1.3;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.apple-btn-secondary-compact:hover,
+.btn-secondary.btn-small:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+.dark .apple-btn-secondary-compact,
+.dark .btn-secondary.btn-small {
+    background-color: #171717;
+    color: #ededed !important;
+    fill: #ededed;
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.dark .apple-btn-secondary-compact:hover,
+.dark .btn-secondary.btn-small:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+/* Type: Tertiary (bg-white / transparent, hover:bg-[#00000014], text-[#171717], no border) */
+.apple-btn-tertiary,
+.btn-tertiary {
     background-color: transparent;
-    color: #0066cc !important;
-    border: 1px solid #0066cc;
-    font-family: var(--font-sans);
-    font-size: 17px;
-    font-weight: 400;
-    line-height: 1.47;
-    letter-spacing: -0.374px;
-    border-radius: 9999px;
-    padding: 11px 22px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: transform 0.12s ease;
-    box-shadow: none !important;
-    white-space: nowrap;
-}
-
-.apple-btn-secondary:active {
-    transform: scale(0.95);
-}
-
-.apple-btn-secondary:focus-visible {
-    outline: 2px solid #0071e3;
-    outline-offset: 2px;
-}
-
-.apple-btn-secondary-compact {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    background-color: transparent;
-    color: #0066cc !important;
-    border: 1px solid #0066cc;
-    font-family: var(--font-sans);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.29;
-    letter-spacing: -0.224px;
-    border-radius: 9999px;
-    padding: 8px 16px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: transform 0.12s ease;
-    box-shadow: none !important;
-    white-space: nowrap;
-}
-
-.apple-btn-secondary-compact:active {
-    transform: scale(0.95);
-}
-
-.apple-btn-secondary-compact:focus-visible {
-    outline: 2px solid #0071e3;
-    outline-offset: 2px;
-}
-
-/* button-danger: Destructive action (abort/delete in modals) */
-.apple-btn-danger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    background-color: #ff3b30;
-    color: #ffffff !important;
-    font-family: var(--font-sans);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.29;
-    letter-spacing: -0.224px;
-    border-radius: 9999px;
-    padding: 8px 16px;
+    color: #171717 !important;
+    fill: #171717;
     border: none;
-    cursor: pointer;
-    text-decoration: none;
-    transition: transform 0.12s ease, background-color 0.12s ease;
+    border-radius: 100px;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.apple-btn-tertiary:hover,
+.btn-tertiary:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+.dark .apple-btn-tertiary,
+.dark .btn-tertiary {
+    color: #ededed !important;
+    fill: #ededed;
+}
+
+.dark .apple-btn-tertiary:hover,
+.dark .btn-tertiary:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+/* Type: Error / Destructive (bg-[#ea001d] dark:bg-[#e2162a] hover:bg-[#ae292f] text-[#f5f5f5]) */
+.apple-btn-danger,
+.apple-btn-error,
+.btn-error {
+    background-color: #ea001d;
+    color: #f5f5f5 !important;
+    fill: #f5f5f5;
+    border: none;
+    border-radius: 100px;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.apple-btn-danger:hover,
+.apple-btn-error:hover,
+.btn-error:hover {
+    background-color: #ae292f;
+}
+
+.dark .apple-btn-danger,
+.dark .apple-btn-error,
+.dark .btn-error {
+    background-color: #e2162a;
+    color: #ffffff !important;
+}
+
+.dark .apple-btn-danger:hover,
+.dark .apple-btn-error:hover,
+.dark .btn-error:hover {
+    background-color: #ff565f;
+}
+
+/* Type: Warning (bg-[#ff9300] hover:bg-[#d27504] text-[#0a0a0a]) */
+.apple-btn-warning,
+.btn-warning {
+    background-color: #ff9300;
+    color: #0a0a0a !important;
+    fill: #0a0a0a;
+    border: none;
+    border-radius: 100px;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.apple-btn-warning:hover,
+.btn-warning:hover {
+    background-color: #d27504;
+}
+
+/* Sizes */
+.btn-tiny {
+    height: 24px !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+}
+
+.btn-small {
+    height: 32px !important;
+    padding: 0 14px !important;
+    font-size: 13px !important;
+}
+
+.btn-medium {
+    height: 40px !important;
+    padding: 0 18px !important;
+    font-size: 14px !important;
+}
+
+.btn-large {
+    height: 48px !important;
+    padding: 0 24px !important;
+    font-size: 16px !important;
+}
+
+/* Shapes */
+.btn-square.btn-tiny { border-radius: 4px !important; }
+.btn-square.btn-small,
+.btn-square.btn-medium { border-radius: 6px !important; }
+.btn-square.btn-large { border-radius: 8px !important; }
+.btn-circle { border-radius: 9999px !important; aspect-ratio: 1 / 1; padding: 0 !important; }
+.btn-rounded { border-radius: 100px !important; }
+
+/* Disabled / Loading State */
+.apple-btn-primary:disabled,
+.apple-btn-primary[disabled],
+.apple-btn-primary-compact:disabled,
+.apple-btn-primary-compact[disabled],
+.apple-btn-secondary:disabled,
+.apple-btn-secondary[disabled],
+.apple-btn-secondary-compact:disabled,
+.apple-btn-secondary-compact[disabled],
+.apple-btn-danger:disabled,
+.apple-btn-danger[disabled],
+.apple-btn-warning:disabled,
+.apple-btn-warning[disabled],
+.apple-btn-tertiary:disabled,
+.apple-btn-tertiary[disabled],
+.btn:disabled,
+.btn[disabled],
+.btn-loading {
+    background-color: #f2f2f2 !important;
+    color: #8f8f8f !important;
+    fill: #8f8f8f !important;
+    border: 1px solid #ebebeb !important;
+    cursor: not-allowed !important;
+    transform: none !important;
     box-shadow: none !important;
-    white-space: nowrap;
+    pointer-events: none;
 }
 
-.apple-btn-danger:active {
-    transform: scale(0.95);
+.dark .apple-btn-primary:disabled,
+.dark .apple-btn-secondary:disabled,
+.dark .btn:disabled,
+.dark .btn-loading {
+    background-color: #1a1a1a !important;
+    color: #8f8f8f !important;
+    fill: #8f8f8f !important;
+    border-color: #2e2e2e !important;
 }
 
-/* button-dark-utility: nav utility (Sign In, Keluar) */
+/* Utility Nav Button */
 .apple-btn-dark {
     display: inline-flex;
     align-items: center;
@@ -695,29 +880,23 @@ body {
     color: #ffffff !important;
     font-family: var(--font-sans);
     font-size: 12px;
-    font-weight: 400;
+    font-weight: 500;
     line-height: 1.29;
     letter-spacing: -0.12px;
     border-radius: 8px;
-    padding: 4px 12px;
+    padding: 5px 14px;
     border: none;
     cursor: pointer;
     text-decoration: none;
-    transition: transform 0.12s ease;
-    box-shadow: none !important;
+    transition: background-color 0.15s ease, transform 0.12s ease;
     white-space: nowrap;
 }
 
-.apple-btn-dark:active {
-    transform: scale(0.95);
+.apple-btn-dark:hover {
+    background-color: #383838;
 }
 
-.apple-btn-dark:focus-visible {
-    outline: 2px solid #0071e3;
-    outline-offset: 2px;
-}
-
-/* button-pearl-capsule: secondary card button */
+/* Pearl Capsule Button */
 .apple-btn-pearl {
     display: inline-flex;
     align-items: center;
@@ -725,22 +904,139 @@ body {
     background-color: #fafafc;
     color: #333333;
     font-family: var(--font-sans);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.43;
-    letter-spacing: -0.224px;
-    border: 3px solid #f0f0f0;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 11px;
-    padding: 8px 16px;
+    padding: 7px 16px;
     cursor: pointer;
     text-decoration: none;
-    transition: transform 0.12s ease;
-    box-shadow: none !important;
+    transition: background-color 0.15s ease, transform 0.12s ease;
     white-space: nowrap;
 }
 
-.apple-btn-pearl:active {
-    transform: scale(0.95);
+.apple-btn-pearl:hover {
+    background-color: #f0f0f2;
+}
+
+/* ========================================================================
+   Apple Custom Field Validation Warning UI
+   Replaces native browser HTML5 validation balloons with a custom UI
+   ======================================================================== */
+
+.apple-validation-tooltip {
+    position: absolute;
+    z-index: 99999;
+    display: none;
+    pointer-events: none;
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.14)) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.08));
+    animation: appleValidationPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.apple-validation-tooltip.is-visible {
+    display: block;
+}
+
+@keyframes appleValidationPop {
+    0% {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.97);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.apple-validation-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #ffffff;
+    color: #1d1d1f;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    padding: 8px 14px 8px 10px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.15px;
+    white-space: nowrap;
+    max-width: 380px;
+}
+
+.dark .apple-validation-content {
+    background-color: #1f1f21;
+    color: #f5f5f7;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.apple-validation-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background-color: #ff9500;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.apple-validation-arrow {
+    position: absolute;
+    top: -6px;
+    left: 20px;
+    width: 14px;
+    height: 7px;
+    overflow: hidden;
+}
+
+.apple-validation-arrow::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    width: 8px;
+    height: 8px;
+    background-color: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    border-left: 1px solid rgba(0, 0, 0, 0.12);
+    transform: rotate(45deg);
+}
+
+.dark .apple-validation-arrow::after {
+    background-color: #1f1f21;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.apple-validation-tooltip.is-above .apple-validation-arrow {
+    top: auto;
+    bottom: -6px;
+}
+
+.apple-validation-tooltip.is-above .apple-validation-arrow::after {
+    top: auto;
+    bottom: 2px;
+    border-top: none;
+    border-left: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.dark .apple-validation-tooltip.is-above .apple-validation-arrow::after {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Invalid Input Highlight State */
+.apple-input.apple-input-invalid,
+input.apple-input-invalid,
+textarea.apple-input-invalid,
+select.apple-input-invalid {
+    border-color: #ff3b30 !important;
+    box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.16) !important;
+    outline: none !important;
 }
 
 /* Text Links */

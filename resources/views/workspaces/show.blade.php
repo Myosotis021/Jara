@@ -161,7 +161,7 @@
                     </div>
 
                     <button type="button" class="apple-btn-primary-compact open-task-modal-btn" style="height:32px;padding:0 14px;font-size:12px;">
-                        + Tambah Tugas
+                        Tambah Tugas
                     </button>
                 </div>
             </div>
@@ -178,12 +178,9 @@
                     <h4 class="typography-body-strong" style="color:#1d1d1f;margin:0 0 4px;">
                         Belum Ada Tugas di Workspace Ini
                     </h4>
-                    <p class="typography-caption" style="color:#7a7a7a;margin:0 0 16px;">
-                        Kelola tugas proyek Anda dengan menekan tombol di bawah.
+                    <p class="typography-caption" style="color:#7a7a7a;margin:0;">
+                        Tugas yang dibuat pada ruang kerja ini akan ditampilkan di sini.
                     </p>
-                    <button type="button" class="apple-btn-primary open-task-modal-btn">
-                        + Tambah Tugas Baru
-                    </button>
                 </div>
 
             @else
@@ -743,7 +740,7 @@
                     Batal
                 </button>
                 <button type="submit" class="apple-btn-primary">
-                    + Tambah Tugas
+                    Tambah Tugas
                 </button>
             </div>
         </form>

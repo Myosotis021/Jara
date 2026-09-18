@@ -102,7 +102,7 @@
               data-confirm-btn="Hapus Workspace">
             @csrf
             @method('DELETE')
-            <button type="submit" class="apple-btn-primary" style="background-color:#ff3b30;">
+            <button type="submit" class="apple-btn-danger">
                 Hapus Workspace
             </button>
         </form>
