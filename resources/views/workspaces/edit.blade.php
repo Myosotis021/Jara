@@ -1,30 +1,41 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Workspace - JARA')
+@section('title', 'Edit Workspace — JARA')
+
+@section('subnav_title')
+    <div class="flex items-center space-x-3 truncate">
+        <a href="{{ route('workspaces.show', $workspace) }}" class="text-[#7a7a7a] hover:text-[#1d1d1f] transition text-[14px]">
+            &larr; {{ $workspace->name }}
+        </a>
+        <span class="text-[#e0e0e0]">/</span>
+        <span class="truncate">Pengaturan</span>
+    </div>
+@endsection
 
 @section('content')
-<div class="max-w-xl mx-auto">
-    <div class="mb-6">
-        <a href="{{ route('workspaces.index') }}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 transition">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Kembali ke Daftar Workspace
-        </a>
-    </div>
+<div class="max-w-2xl mx-auto">
+    <!-- Store Utility Card Form -->
+    <div class="apple-card p-8 sm:p-10">
+        <div class="mb-8">
+            <span class="apple-chip !py-1 !px-3 !text-[12px] uppercase font-semibold tracking-wider mb-2">
+                Workspace
+            </span>
+            <h1 class="typography-display-md text-[#1d1d1f] tracking-tight mt-2">
+                Edit Workspace
+            </h1>
+            <p class="typography-body text-[#7a7a7a] mt-1">
+                Perbarui nama atau rincian keterangan untuk ruang kerja ini.
+            </p>
+        </div>
 
-    <div class="bg-white rounded-xl shadow-xs border border-gray-200 p-6 sm:p-8">
-        <h1 class="text-xl font-bold text-gray-900 tracking-tight mb-1">Edit Workspace</h1>
-        <p class="text-sm text-gray-500 mb-6">Perbarui nama atau keterangan workspace Anda.</p>
-
-        <form action="{{ route('workspaces.update', $workspace) }}" method="POST" class="space-y-5">
+        <form action="{{ route('workspaces.update', $workspace) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
 
             <!-- Nama Workspace -->
             <div>
-                <label for="name" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                    Nama Workspace <span class="text-red-500">*</span>
+                <label for="name" class="block typography-caption-strong text-[#1d1d1f] mb-1.5">
+                    Nama Workspace <span class="text-[#ff3b30]">*</span>
                 </label>
                 <input 
                     type="text" 
@@ -34,16 +45,16 @@
                     maxlength="100"
                     placeholder="Misal: Tugas Kuliah Semester 4"
                     value="{{ old('name', $workspace->name) }}"
-                    class="w-full px-3.5 py-2.5 border @error('name') border-red-500 focus:ring-red-500 @else border-gray-300 focus:ring-blue-500 @enderror rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 transition"
+                    class="apple-input {{ $errors->has('name') ? '!border-[#ff3b30]' : '' }}"
                 >
                 @error('name')
-                    <p class="text-xs text-red-600 mt-1 font-medium">{{ $message }}</p>
+                    <p class="typography-caption text-[#ff3b30] mt-1.5">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Deskripsi Workspace -->
             <div>
-                <label for="description" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                <label for="description" class="block typography-caption-strong text-[#1d1d1f] mb-1.5">
                     Deskripsi Singkat (Opsional)
                 </label>
                 <textarea 
@@ -52,27 +63,54 @@
                     rows="4" 
                     maxlength="500"
                     placeholder="Deskripsi singkat mengenai daftar tugas ini..."
-                    class="w-full px-3.5 py-2.5 border @error('description') border-red-500 focus:ring-red-500 @else border-gray-300 focus:ring-blue-500 @enderror rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 transition"
+                    class="apple-input-box {{ $errors->has('description') ? '!border-[#ff3b30]' : '' }}"
                 >{{ old('description', $workspace->description) }}</textarea>
-                <div class="flex justify-between items-center mt-1">
+                <div class="flex justify-between items-center mt-1.5 typography-fine-print text-[#7a7a7a]">
                     @error('description')
-                        <p class="text-xs text-red-600 font-medium">{{ $message }}</p>
+                        <p class="typography-caption text-[#ff3b30]">{{ $message }}</p>
                     @else
                         <span></span>
                     @enderror
-                    <span class="text-xs text-gray-400">Maksimal 500 karakter</span>
+                    <span>Maksimal 500 karakter</span>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-gray-100">
-                <a href="{{ route('workspaces.index') }}" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition">
+            <!-- Action Buttons: Cancel and button-primary -->
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-[#f0f0f0]">
+                <a href="{{ route('workspaces.show', $workspace) }}" class="apple-btn-secondary-compact">
                     Batal
                 </a>
-                <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-xs transition">
+                <button type="submit" class="apple-btn-primary">
                     Simpan Perubahan
                 </button>
             </div>
+        </form>
+    </div>
+
+    <div class="apple-card p-8 sm:p-10 mt-6" style="border-color:#f5c6c2;">
+        <h2 class="typography-tagline text-[#1d1d1f] m-0">
+            Hapus Workspace
+        </h2>
+        <p class="typography-body text-[#7a7a7a] mt-2 mb-6">
+            Tindakan ini permanen. Seluruh tugas dan file lampiran di dalam workspace ini akan ikut terhapus.
+        </p>
+        <form action="{{ route('workspaces.destroy', $workspace) }}"
+              method="POST"
+              style="margin:0;"
+              data-confirm="Hapus workspace ini? Seluruh tugas dan file lampiran di dalamnya akan ikut terhapus permanen."
+              data-confirm-title="Hapus Workspace"
+              data-confirm-btn="Hapus Workspace">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="apple-btn-danger" style="display:inline-flex;align-items:center;gap:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                <span>Hapus Workspace</span>
+            </button>
         </form>
     </div>
 </div>
